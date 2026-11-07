@@ -34,6 +34,32 @@ input:focus,select:focus{border-color:var(--orange2);box-shadow:0 0 0 3px rgba(2
 table{width:100%;border-collapse:collapse;margin-top:12px;min-width:620px}td,th{text-align:right;padding:11px;border-bottom:1px solid #294563;font-size:13px}th{color:#fff;background:#173657}td{color:#e7eef7}.tablewrap{overflow:auto;border-radius:12px}
 .pill{color:#ff9a43;font-weight:700}.red{color:#ff8989}
 #notice:not(.hidden){display:block}
+
+/* Enhanced session cards and admin dashboard */
+.session{position:relative;overflow:hidden;transition:transform .22s,border-color .22s,box-shadow .22s}
+.session:hover{transform:translateY(-3px);border-color:#e87920;box-shadow:0 12px 26px rgba(0,0,0,.25)}
+.public-session{padding:19px 20px 17px;background:linear-gradient(125deg,rgba(22,57,94,.98),rgba(7,27,50,.98));border:1px solid #345b82;border-right:5px solid var(--orange2)}
+.public-session:after{content:"⚽";position:absolute;left:18px;bottom:-22px;font-size:92px;opacity:.055;pointer-events:none}
+.session-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;position:relative;z-index:1}
+.session-title{font-size:18px;font-weight:800;color:#fff}
+.session-tag{display:inline-flex;align-items:center;gap:6px;background:rgba(255,121,13,.14);border:1px solid rgba(255,145,57,.38);color:#ffb16f;border-radius:30px;padding:4px 11px;font-size:12px;font-weight:700}
+.session-details{display:flex;gap:10px 20px;flex-wrap:wrap;margin:13px 0;color:#d9e6f4;font-size:13px;position:relative;z-index:1}
+.session-details span{display:inline-flex;align-items:center;gap:6px}
+.session-bottom{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;position:relative;z-index:1}
+.session-price{font-weight:800;color:#fff;font-size:15px}
+.book-btn{min-width:150px}
+.admin-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:4px 0 18px}
+.admin-stat{background:linear-gradient(140deg,#173b62,#0b203a);border:1px solid #345678;border-radius:15px;padding:15px;text-align:center}
+.admin-stat strong{display:block;font-size:23px;color:#ff9a43;line-height:1.4}
+.admin-stat span{font-size:12px;color:#c4d4e5}
+.admin-session{border-right-width:5px}
+.admin-session.closed{border-right-color:#8294a9}
+.admin-session .admin-status{font-size:12px;font-weight:700;border-radius:30px;padding:4px 10px;background:#174b37;color:#9af0c2}
+.admin-session .admin-status.closed{background:#3a4655;color:#d4dce5}
+.admin-session .actions{margin:13px 0 6px}
+.admin-session .tablewrap{border:1px solid #294563}
+#admin-sessions h3{font-size:15px;color:#fff;margin:15px 0 6px}
+@media(max-width:600px){.admin-summary{grid-template-columns:1fr 1fr}.admin-stat:last-child{grid-column:1/-1}.session-details{gap:8px 13px}.book-btn{width:100%}}
 @media(max-width:600px){header{height:260px;min-height:260px;background-position:center 25%}main{padding:15px 11px 40px}.card{padding:16px;border-radius:16px}button{padding:10px 13px}h2{font-size:18px}}
 </style></head>
 <body>
@@ -77,7 +103,8 @@ async function loadSessions(){
 const {data,error}=await sb.from("sessions").select("id,title,session_date,start_time,duration,fee").eq("is_open",true).order("session_date").order("start_time");
 if(error){el("sessions").textContent="خطا در دریافت سانس‌ها: "+error.message;return}
 rows=data||[];
-el("sessions").innerHTML=rows.length?rows.map(s=>'<div class="session"><b>'+esc(s.title)+'</b><p class="muted">'+dateFa(s.session_date)+"، "+esc(String(s.start_time).slice(0,5))+"، "+esc(s.duration||"")+'</p>'+toman(s.fee)+'</div>').join(""):"هنوز سانس فعالی وجود ندارد.";
+el("sessions").innerHTML=rows.length?rows.map(s=>'<div class="session public-session"><div class="session-top"><span class="session-title">'+esc(s.title)+'</span><span class="session-tag">● ثبت‌نام باز است</span></div><div class="session-details"><span>📅 '+dateFa(s.session_date)+'</span><span>🕒 '+esc(String(s.start_time).slice(0,5))+'</span><span>⏱ '+esc(s.duration||"۹۰ دقیقه")+'</span></div><div class="session-bottom"><span class="session-price">هزینه: '+toman(s.fee)+'</span><button class="book-btn" type="button" data-book="'+s.id+'">ثبت‌نام در این سانس ←</button></div></div>').join(""):"هنوز سانس فعالی وجود ندارد.";
+el("sessions").querySelectorAll("[data-book]").forEach(b=>b.onclick=()=>{el("session-select").value=b.dataset.book;el("reg").scrollIntoView({behavior:"smooth",block:"center"});el("reg").querySelector('[name="player_name"]').focus()});
 el("session-select").innerHTML='<option value="">انتخاب سانس</option>'+rows.map(s=>'<option value="'+s.id+'">'+esc(s.title)+" - "+dateFa(s.session_date)+" "+esc(String(s.start_time).slice(0,5))+'</option>').join("");
 }
 el("refresh").onclick=loadSessions;
@@ -110,14 +137,19 @@ el("new-session").onsubmit=async e=>{e.preventDefault();const f=new FormData(e.t
 async function loadAdmin(){
 const {data:sessions,error}=await sb.from("sessions").select("*").order("session_date",{ascending:false});
 if(error){el("admin-sessions").textContent=error.message;return}
-let out="";
+let out="";let totalPlayers=0,paidPlayers=0,paidTotal=0;
+const all=[];
 for(const s of sessions||[]){
 const {data:r,error:re}=await sb.from("registrations").select("*").eq("session_id",s.id).order("created_at");
-out+='<div class="session"><div class="row"><b>'+esc(s.title)+'</b><span class="pill">'+((r||[]).length).toLocaleString("fa-IR")+' بازیکن ثبت‌نام‌شده</span></div><div class="muted">'+dateFa(s.session_date)+' — '+esc(String(s.start_time).slice(0,5))+' — '+toman(s.fee)+'</div><div class="actions"><button class="alt" data-open="'+s.id+'" data-val="'+s.is_open+'">'+(s.is_open?"بستن ثبت‌نام":"بازکردن ثبت‌نام")+'</button></div>';
+const list=r||[];totalPlayers+=list.length;paidPlayers+=list.filter(x=>x.paid).length;paidTotal+=list.filter(x=>x.paid).reduce((sum,x)=>sum+Number(x.amount||0),0);all.push({s,r:list,re});
+}
+out='<div class="admin-summary"><div class="admin-stat"><strong>'+((sessions||[]).length).toLocaleString("fa-IR")+'</strong><span>کل سانس‌ها</span></div><div class="admin-stat"><strong>'+totalPlayers.toLocaleString("fa-IR")+'</strong><span>کل ثبت‌نام‌ها</span></div><div class="admin-stat"><strong>'+paidPlayers.toLocaleString("fa-IR")+'</strong><span>پرداخت‌های تأییدشده</span></div></div><div class="admin-stat" style="margin-bottom:16px;text-align:right"><span>مجموع مبالغ تأییدشده</span><strong style="font-size:19px">'+toman(paidTotal)+'</strong></div>';
+for(const item of all){const s=item.s,r=item.r,re=item.re;
+out+='<div class="session admin-session '+(s.is_open?'':'closed')+'"><div class="row"><b class="session-title">'+esc(s.title)+'</b><span class="admin-status '+(s.is_open?'':'closed')+'">'+(s.is_open?'● ثبت‌نام باز':'● ثبت‌نام بسته')+'</span></div><div class="session-details"><span>📅 '+dateFa(s.session_date)+'</span><span>🕒 '+esc(String(s.start_time).slice(0,5))+'</span><span>👥 '+r.length.toLocaleString("fa-IR")+' بازیکن</span><span>💳 '+toman(s.fee)+'</span></div><div class="actions"><button class="alt" data-open="'+s.id+'" data-val="'+s.is_open+'">'+(s.is_open?'بستن ثبت‌نام':'بازکردن ثبت‌نام')+'</button></div>';
 if(re)out+='<p class="red">'+esc(re.message)+'</p>';
-else if(r?.length)out+='<p class="muted">فهرست بازیکنان ('+r.length.toLocaleString("fa-IR")+' نفر)</p><div class="tablewrap"><table><tr><th>نام</th><th>تماس</th><th>مبلغ</th><th>پرداخت</th><th>عملیات</th></tr>'+r.map(x=>'<tr><td>'+esc(x.player_name)+'</td><td>'+esc(x.phone)+'</td><td>'+toman(x.amount)+'</td><td class="'+(x.paid?"pill":"red")+'">'+(x.paid?"پرداخت‌شده":"پرداخت‌نشده")+'</td><td><button data-paid="'+x.id+'" data-val="'+x.paid+'">'+(x.paid?"لغو تأیید":"تأیید پرداخت")+'</button></td></tr>').join("")+'</table></div>';
-else out+="<p class=muted>ثبت‌نامی وجود ندارد.</p>";
-out+="</div>";
+else if(r.length)out+='<h3>فهرست بازیکنان · '+r.length.toLocaleString("fa-IR")+' نفر</h3><div class="tablewrap"><table><tr><th>نام</th><th>تماس</th><th>مبلغ</th><th>پرداخت</th><th>عملیات</th></tr>'+r.map(x=>'<tr><td>'+esc(x.player_name)+'</td><td>'+esc(x.phone)+'</td><td>'+toman(x.amount)+'</td><td class="'+(x.paid?'pill':'red')+'">'+(x.paid?'پرداخت‌شده':'پرداخت‌نشده')+'</td><td><button data-paid="'+x.id+'" data-val="'+x.paid+'">'+(x.paid?'لغو تأیید':'تأیید پرداخت')+'</button></td></tr>').join('')+'</table></div>';
+else out+='<p class="muted">هنوز بازیکنی برای این سانس ثبت‌نام نکرده است.</p>';
+out+='</div>';
 }
 el("admin-sessions").innerHTML=out||"سانسی وجود ندارد.";
 el("admin-sessions").querySelectorAll("[data-paid]").forEach(b=>b.onclick=async()=>{const {error}=await sb.from("registrations").update({paid:b.dataset.val!=="true"}).eq("id",b.dataset.paid);if(error)msg(error.message,true);loadAdmin()});
