@@ -98,9 +98,9 @@ if(error){el("admin-sessions").textContent=error.message;return}
 let out="";
 for(const s of sessions||[]){
 const {data:r,error:re}=await sb.from("registrations").select("*").eq("session_id",s.id).order("created_at");
-out+='<div class="session"><b>'+esc(s.title)+'</b> — '+dateFa(s.session_date)+' '+esc(String(s.start_time).slice(0,5))+' — '+toman(s.fee)+' <div class="actions"><button class="alt" data-open="'+s.id+'" data-val="'+s.is_open+'">'+(s.is_open?"بستن ثبت‌نام":"بازکردن ثبت‌نام")+'</button></div>';
+out+='<div class="session"><div class="row"><b>'+esc(s.title)+'</b><span class="pill">'+((r||[]).length).toLocaleString("fa-IR")+' بازیکن ثبت‌نام‌شده</span></div><div class="muted">'+dateFa(s.session_date)+' — '+esc(String(s.start_time).slice(0,5))+' — '+toman(s.fee)+'</div><div class="actions"><button class="alt" data-open="'+s.id+'" data-val="'+s.is_open+'">'+(s.is_open?"بستن ثبت‌نام":"بازکردن ثبت‌نام")+'</button></div>';
 if(re)out+='<p class="red">'+esc(re.message)+'</p>';
-else if(r?.length)out+='<div class="tablewrap"><table><tr><th>نام</th><th>تماس</th><th>مبلغ</th><th>پرداخت</th><th>عملیات</th></tr>'+r.map(x=>'<tr><td>'+esc(x.player_name)+'</td><td>'+esc(x.phone)+'</td><td>'+toman(x.amount)+'</td><td class="'+(x.paid?"pill":"red")+'">'+(x.paid?"پرداخت‌شده":"پرداخت‌نشده")+'</td><td><button data-paid="'+x.id+'" data-val="'+x.paid+'">'+(x.paid?"لغو تأیید":"تأیید پرداخت")+'</button></td></tr>').join("")+'</table></div>';
+else if(r?.length)out+='<p class="muted">فهرست بازیکنان ('+r.length.toLocaleString("fa-IR")+' نفر)</p><div class="tablewrap"><table><tr><th>نام</th><th>تماس</th><th>مبلغ</th><th>پرداخت</th><th>عملیات</th></tr>'+r.map(x=>'<tr><td>'+esc(x.player_name)+'</td><td>'+esc(x.phone)+'</td><td>'+toman(x.amount)+'</td><td class="'+(x.paid?"pill":"red")+'">'+(x.paid?"پرداخت‌شده":"پرداخت‌نشده")+'</td><td><button data-paid="'+x.id+'" data-val="'+x.paid+'">'+(x.paid?"لغو تأیید":"تأیید پرداخت")+'</button></td></tr>').join("")+'</table></div>';
 else out+="<p class=muted>ثبت‌نامی وجود ندارد.</p>";
 out+="</div>";
 }
