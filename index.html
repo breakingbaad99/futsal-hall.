@@ -148,7 +148,7 @@ el("new-session").onsubmit=async e=>{
   e.preventDefault();
   const f=new FormData(e.target);
   const sessionDate=toEnglishDigits(f.get("session_date")||"").trim();
-  if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(sessionDate)){
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(sessionDate)){
     msg("لطفاً تاریخ شمسی را از تقویم انتخاب کنید تا به تاریخ میلادی تبدیل شود.",true);
     return;
   }
