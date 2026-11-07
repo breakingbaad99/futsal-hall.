@@ -4,6 +4,10 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>سالن فوتسال</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css">
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/persian-date@1.1.0/dist/persian-date.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"></script>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f3f6f4;color:#17231f;font-family:Tahoma,Arial,sans-serif}
 header{background:#10251f;color:white;padding:24px}header div,main{max-width:920px;margin:auto}
@@ -37,7 +41,7 @@ table{width:100%;border-collapse:collapse;margin-top:12px}td,th{text-align:right
 </div><button>ورود</button></form></div>
 <div id="panel" class="hidden">
 <div class="card"><button id="logout">خروج مدیر</button><h2>ایجاد سانس</h2><form id="new-session"><div class="grid">
-<div class="field">عنوان<input name="title" required></div><div class="field">تاریخ<input name="session_date" type="date" required></div>
+<div class="field">عنوان<input name="title" required></div><div class="field">تاریخ سانس (شمسی)<input id="session-date-jalali" type="text" placeholder="مثلاً ۱۴۰۵/۰۸/۱۶" autocomplete="off" required><input id="session-date-gregorian" name="session_date" type="hidden" required></div>
 <div class="field">ساعت<input name="start_time" type="time" required></div><div class="field">مدت<input name="duration" value="۹۰ دقیقه" required></div>
 <div class="field">هزینه (تومان)<input name="fee" type="number" min="0" value="0" required></div>
 </div><button>ثبت سانس</button></form></div>
@@ -74,7 +78,20 @@ el("login").classList.add("hidden");el("panel").classList.remove("hidden");loadA
 }
 el("login-form").onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);const {error}=await sb.auth.signInWithPassword({email:f.get("email"),password:f.get("password")});if(error){msg("ورود ناموفق بود؛ ایمیل یا رمز عبور را بررسی کنید.",true);return}checkAdmin()};
 el("logout").onclick=async()=>{await sb.auth.signOut();checkAdmin()};
-el("new-session").onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);const {error}=await sb.from("sessions").insert({title:f.get("title"),session_date:f.get("session_date"),start_time:f.get("start_time"),duration:f.get("duration"),fee:Number(f.get("fee")),is_open:true});if(error){msg("خطا: "+error.message,true);return}msg("سانس ایجاد شد.");e.target.reset();loadAdmin();loadSessions()};
+$("#session-date-jalali").pDatepicker({
+  format:"YYYY/MM/DD",
+  autoClose:true,
+  initialValue:false,
+  observer:true,
+  onSelect:function(unixDate){
+    const gregorian = new persianDate(unixDate).toCalendar("gregorian").format("YYYY-MM-DD");
+    el("session-date-gregorian").value = gregorian;
+  }
+});
+el("session-date-jalali").addEventListener("input",()=>{
+  el("session-date-gregorian").value="";
+});
+el("new-session").onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);if(!f.get("session_date")){msg("لطفاً تاریخ شمسی را از تقویم انتخاب کنید.",true);return;}const {error}=await sb.from("sessions").insert({title:f.get("title"),session_date:f.get("session_date"),start_time:f.get("start_time"),duration:f.get("duration"),fee:Number(f.get("fee")),is_open:true});if(error){msg("خطا: "+error.message,true);return}msg("سانس ایجاد شد.");e.target.reset();loadAdmin();loadSessions()};
 async function loadAdmin(){
 const {data:sessions,error}=await sb.from("sessions").select("*").order("session_date",{ascending:false});
 if(error){el("admin-sessions").textContent=error.message;return}
