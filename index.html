@@ -8,34 +8,36 @@
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/persian-date@1.1.0/dist/persian-date.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"></script>
-<style>*{box-sizing:border-box}
-:root{--navy:#101d35;--navy2:#172945;--orange:#c65a1b;--orange2:#e4772e;--paper:#f2f4f7;--ink:#172235;--muted:#66748a;--line:#dce2ea}
-body{margin:0;background:var(--paper);color:var(--ink);font-family:Tahoma,Arial,sans-serif;line-height:1.65}
-header{background:linear-gradient(125deg,#0c172b 0%,#1b3151 72%,#263d5b 100%);color:white;padding:30px 20px;position:relative;overflow:hidden;border-bottom:5px solid var(--orange)}
-header:after{content:"";position:absolute;width:220px;height:220px;border:26px solid rgba(228,119,46,.13);border-radius:50%;left:-55px;top:-105px}
-header div,main{max-width:960px;margin:auto;position:relative}
-header h1{font-size:30px;letter-spacing:-.5px;margin:0 0 5px}
-header div div{color:#d8e1ed}
-main{padding:22px 14px 55px}
-.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:21px;margin:15px 0;box-shadow:0 7px 22px rgba(16,29,53,.06)}
-h1{margin:0 0 8px}h2{font-size:19px;color:var(--navy);margin:0 0 15px;padding-right:11px;border-right:4px solid var(--orange)}
-.tabs,.actions{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:15px}
-button{background:var(--orange);color:white;border:0;border-radius:11px;padding:11px 17px;font:inherit;font-weight:700;cursor:pointer;transition:background .2s,transform .2s;box-shadow:0 3px 9px rgba(198,90,27,.16)}
-button:hover{background:var(--orange2);transform:translateY(-1px)}
-button.alt{background:var(--navy2);color:#fff;box-shadow:none}
-button.alt:hover{background:#263e60}
-input,select{padding:12px 13px;border:1px solid #cbd4df;border-radius:10px;font:inherit;width:100%;background:#fbfcfe;color:var(--ink);outline:none}
-input:focus,select:focus{border-color:var(--orange2);box-shadow:0 0 0 3px rgba(228,119,46,.13)}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}.field{display:grid;gap:6px;margin:10px 0;font-weight:600}
+<style>
+*{box-sizing:border-box}
+:root{--navy:#07172d;--navy2:#102b4c;--navy3:#17395f;--orange:#d65b0b;--orange2:#ff790d;--paper:#07172d;--ink:#f4f7fb;--muted:#b7c6d8;--line:#28476a}
+html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(ellipse at 50% 0%,#17395f 0%,#07172d 58%);color:var(--ink);font-family:Tahoma,Arial,sans-serif;line-height:1.7}
+header{height:clamp(190px,24vw,275px);min-height:190px;background:#06152a url('futsal-hero.jpg') center center/cover no-repeat;border-bottom:4px solid var(--orange);position:relative;overflow:hidden}
+header:after{content:"";position:absolute;inset:auto 0 0;height:45px;background:linear-gradient(transparent,rgba(3,13,28,.42));pointer-events:none}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+main{max-width:1120px;margin:auto;padding:22px 16px 55px;position:relative}
+.card{background:linear-gradient(145deg,rgba(13,37,67,.98),rgba(5,20,39,.98));border:1px solid #294c73;border-radius:20px;padding:22px;margin:16px 0;box-shadow:0 12px 32px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.035)}
+h1{margin:0 0 8px}h2{font-size:20px;color:#fff;margin:0 0 16px;padding-right:12px;border-right:4px solid var(--orange2)}
+.tabs,.actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+button{background:linear-gradient(135deg,#e96b0b,#c84d06);color:white;border:1px solid rgba(255,177,103,.3);border-radius:12px;padding:11px 18px;font:inherit;font-weight:700;cursor:pointer;transition:filter .2s,transform .2s,box-shadow .2s;box-shadow:0 5px 14px rgba(214,91,11,.2)}
+button:hover{filter:brightness(1.12);transform:translateY(-2px);box-shadow:0 8px 20px rgba(214,91,11,.28)}
+button.alt{background:linear-gradient(135deg,#183b63,#102844);border:1px solid #46698e;color:#fff;box-shadow:none}
+button.alt:hover{background:#234b75}
+input,select{padding:12px 14px;border:1px solid #49698d;border-radius:11px;font:inherit;width:100%;background:#eaf1f8;color:#14263d;outline:none}
+input:focus,select:focus{border-color:var(--orange2);box-shadow:0 0 0 3px rgba(255,121,13,.2)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:13px}.field{display:grid;gap:7px;margin:10px 0;font-weight:600;color:#eaf1f8}
 .muted{color:var(--muted);font-size:13px}
-.session{border:1px solid #e0e5ec;border-right:4px solid var(--orange);border-radius:13px;padding:15px;margin:12px 0;background:linear-gradient(110deg,#fff,#f8f9fb)}
-.hidden{display:none}.notice{background:#fff0e6;color:#8c3c0c;padding:13px 15px;border-radius:11px;margin:12px 0;border:1px solid #f2d0b8}.error{background:#fae8e8;color:#8d2525;border-color:#f0caca}
-table{width:100%;border-collapse:collapse;margin-top:12px}td,th{text-align:right;padding:10px;border-bottom:1px solid #e4e8ee;font-size:13px}th{color:var(--navy);background:#f4f6f9}
-.tablewrap{overflow:auto}.pill{color:#b64e14;font-weight:700}.red{color:#a33b3b}
-@media(max-width:600px){header{padding:23px 17px}header h1{font-size:25px}.card{padding:16px;border-radius:15px}main{padding:15px 11px 40px}button{padding:10px 13px}}
+.session{border:1px solid #345678;border-right:4px solid var(--orange2);border-radius:15px;padding:17px;margin:13px 0;background:linear-gradient(115deg,#12345a,#0b203b);box-shadow:0 7px 18px rgba(0,0,0,.16)}
+.session b{color:#fff}.row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.hidden{display:none}.notice{background:#3b2518;color:#ffd2ad;padding:13px 15px;border-radius:11px;margin:12px 0;border:1px solid #9b531f}.error{background:#421e26;color:#ffd4d4;border-color:#9b3b48}
+table{width:100%;border-collapse:collapse;margin-top:12px;min-width:620px}td,th{text-align:right;padding:11px;border-bottom:1px solid #294563;font-size:13px}th{color:#fff;background:#173657}td{color:#e7eef7}.tablewrap{overflow:auto;border-radius:12px}
+.pill{color:#ff9a43;font-weight:700}.red{color:#ff8989}
+#notice:not(.hidden){display:block}
+@media(max-width:600px){header{height:190px;background-position:center}main{padding:15px 11px 40px}.card{padding:16px;border-radius:16px}button{padding:10px 13px}h2{font-size:18px}}
 </style></head>
 <body>
-<header><div><h1>سالن فوتسال</h1><div>مشاهده سانس‌ها و ثبت‌نام آنلاین بازیکنان</div></div></header>
+<header role="img" aria-label="سالن فوتسال؛ مشاهده سانس‌ها و ثبت‌نام آنلاین بازیکنان"><h1 class="sr-only">سالن فوتسال</h1></header>
 <main>
 <div class="tabs"><button id="player-tab">سانس‌ها و ثبت‌نام</button><button class="alt" id="admin-tab">ورود مدیر</button></div>
 <div id="notice" class="hidden"></div>
