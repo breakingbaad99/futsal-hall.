@@ -1,9 +1,8 @@
 
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <circle cx="50" cy="50" r="47" fill="#39d000"/>
-  <circle cx="50" cy="50" r="35" fill="#ffffff" stroke="#111111" stroke-width="4"/>
-  <path d="M50 30 L63 39 L58 54 L42 54 L37 39 Z" fill="#111111"/>
-  <path d="M37 39 L24 35 L18 48 L29 59 L42 54" fill="#111111"/>
-  <path d="M63 39 L76 35 L82 48 L71 59 L58 54" fill="#111111"/>
-  <path d="M42 54 L35 70 L45 82 L57 82 L65 70 L58 54" fill="#111111"/>
+  <rect width="100" height="100" fill="white"/>
+  <text x="50" y="82"
+        text-anchor="middle"
+        font-size="88"
+        font-family="Arial, sans-serif">⚽︎</text>
 </svg>
