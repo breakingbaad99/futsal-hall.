@@ -122,20 +122,50 @@ el("login").classList.add("hidden");el("panel").classList.remove("hidden");loadA
 }
 el("login-form").onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);const {error}=await sb.auth.signInWithPassword({email:f.get("email"),password:f.get("password")});if(error){msg("ورود ناموفق بود؛ ایمیل یا رمز عبور را بررسی کنید.",true);return}checkAdmin()};
 el("logout").onclick=async()=>{await sb.auth.signOut();checkAdmin()};
+// تبدیل ارقام فارسی/عربی به انگلیسی؛ PostgreSQL برای نوع date قالب میلادی ASCII می‌خواهد.
+function toEnglishDigits(value){
+  return String(value)
+    .replace(/[۰-۹]/g, d => "۰۱۲۳۴۵۶۷۸۹".indexOf(d))
+    .replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
+}
 $("#session-date-jalali").pDatepicker({
   format:"YYYY/MM/DD",
   autoClose:true,
   initialValue:false,
   observer:true,
   onSelect:function(unixDate){
-    const gregorian = new persianDate(unixDate).toCalendar("gregorian").format("YYYY-MM-DD");
-    el("session-date-gregorian").value = gregorian;
+    const gregorian = new persianDate(unixDate)
+      .toCalendar("gregorian")
+      .toLocale("en")
+      .format("YYYY-MM-DD");
+    el("session-date-gregorian").value = toEnglishDigits(gregorian);
   }
 });
 el("session-date-jalali").addEventListener("input",()=>{
   el("session-date-gregorian").value="";
 });
-el("new-session").onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);if(!f.get("session_date")){msg("لطفاً تاریخ شمسی را از تقویم انتخاب کنید.",true);return;}const {error}=await sb.from("sessions").insert({title:f.get("title"),session_date:f.get("session_date"),start_time:f.get("start_time"),duration:f.get("duration"),fee:Number(f.get("fee")),is_open:true});if(error){msg("خطا: "+error.message,true);return}msg("سانس ایجاد شد.");e.target.reset();loadAdmin();loadSessions()};
+el("new-session").onsubmit=async e=>{
+  e.preventDefault();
+  const f=new FormData(e.target);
+  const sessionDate=toEnglishDigits(f.get("session_date")||"").trim();
+  if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(sessionDate)){
+    msg("لطفاً تاریخ شمسی را از تقویم انتخاب کنید تا به تاریخ میلادی تبدیل شود.",true);
+    return;
+  }
+  const {error}=await sb.from("sessions").insert({
+    title:f.get("title"),
+    session_date:sessionDate,
+    start_time:f.get("start_time"),
+    duration:f.get("duration"),
+    fee:Number(f.get("fee")),
+    is_open:true
+  });
+  if(error){msg("خطا: "+error.message,true);return}
+  msg("سانس ایجاد شد.");
+  e.target.reset();
+  loadAdmin();
+  loadSessions();
+};
 async function loadAdmin(){
 const {data:sessions,error}=await sb.from("sessions").select("*").order("session_date",{ascending:false});
 if(error){el("admin-sessions").textContent=error.message;return}
