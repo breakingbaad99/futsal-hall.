@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>سالن فوتسال</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f3f6f4;color:#17231f;font-family:Tahoma,Arial,sans-serif}
+header{background:#10251f;color:white;padding:24px}header div,main{max-width:920px;margin:auto}
+main{padding:20px 14px 50px}.card{background:white;border:1px solid #dce6df;border-radius:14px;padding:18px;margin:14px 0}
+h1{margin:0 0 8px}h2{font-size:19px;margin-top:0}.tabs,.actions{display:flex;gap:8px;flex-wrap:wrap}
+button{background:#176b4d;color:white;border:0;border-radius:9px;padding:11px 15px;font:inherit;cursor:pointer}
+button.alt{background:#e4eee8;color:#173b2d}input,select{padding:12px;border:1px solid #cbd8d0;border-radius:9px;font:inherit;width:100%;background:white}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}.field{display:grid;gap:6px;margin:10px 0}
+.muted{color:#65756d;font-size:13px}.session{border:1px solid #e2ebe5;border-radius:10px;padding:13px;margin:10px 0}
+.hidden{display:none}.notice{background:#e8f2ed;padding:12px;border-radius:9px;margin:12px 0}.error{background:#fae8e8;color:#8d2525}
+table{width:100%;border-collapse:collapse;margin-top:12px}td,th{text-align:right;padding:9px;border-bottom:1px solid #e4eae6;font-size:13px}
+.tablewrap{overflow:auto}.pill{color:#176b4d}.red{color:#a33b3b}
+</style></head>
+<body>
+<header><div><h1>سالن فوتسال</h1><div>مشاهده سانس‌ها و ثبت‌نام آنلاین بازیکنان</div></div></header>
+<main>
+<div class="tabs"><button id="player-tab">سانس‌ها و ثبت‌نام</button><button class="alt" id="admin-tab">ورود مدیر</button></div>
+<div id="notice" class="hidden"></div>
+<section id="player">
+<div class="card"><h2>سانس‌های فعال</h2><div id="sessions">در حال دریافت…</div><button class="alt" id="refresh">به‌روزرسانی</button></div>
+<div class="card"><h2>ثبت‌نام بازیکن</h2><form id="reg"><div class="grid">
+<div class="field">نام و نام خانوادگی<input name="player_name" required maxlength="100"></div>
+<div class="field">شماره تماس<input name="phone" required maxlength="30"></div>
+<div class="field">انتخاب سانس<select id="session-select" name="session_id" required><option value="">انتخاب سانس</option></select></div>
+</div><button>ثبت‌نام</button><p class="muted">ثبت‌نام فوری است؛ تأیید پرداخت توسط مدیر انجام می‌شود.</p></form></div>
+</section>
+<section id="admin" class="hidden">
+<div class="card" id="login"><h2>ورود مدیر</h2><form id="login-form"><div class="grid">
+<div class="field">ایمیل<input name="email" type="email" required></div>
+<div class="field">رمز عبور<input name="password" type="password" required></div>
+</div><button>ورود</button></form></div>
+<div id="panel" class="hidden">
+<div class="card"><button id="logout">خروج مدیر</button><h2>ایجاد سانس</h2><form id="new-session"><div class="grid">
+<div class="field">عنوان<input name="title" required></div><div class="field">تاریخ<input name="session_date" type="date" required></div>
+<div class="field">ساعت<input name="start_time" type="time" required></div><div class="field">مدت<input name="duration" value="۹۰ دقیقه" required></div>
+<div class="field">هزینه (تومان)<input name="fee" type="number" min="0" value="0" required></div>
+</div><button>ثبت سانس</button></form></div>
+<div class="card"><h2>مدیریت ثبت‌نام‌ها و پرداخت</h2><div id="admin-sessions"></div></div>
+</div></section>
+</main>
+<script>
+const SUPABASE_URL="https://exruesqxsnrrjssrzqin.supabase.co";
+const SUPABASE_KEY="sb_publishable_pMEubiQyZ9lLH8FWvT-U4A_QrG4pA0m";
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const el=id=>document.getElementById(id);
+let rows=[];
+function msg(t,bad=false){el("notice").textContent=t;el("notice").className=bad?"notice error":"notice"}
+function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function dateFa(d){return new Date(d+"T12:00:00").toLocaleDateString("fa-IR")}
+function toman(n){return Number(n||0).toLocaleString("fa-IR")+" تومان"}
+async function loadSessions(){
+const {data,error}=await sb.from("sessions").select("id,title,session_date,start_time,duration,fee").eq("is_open",true).order("session_date").order("start_time");
+if(error){el("sessions").textContent="خطا در دریافت سانس‌ها: "+error.message;return}
+rows=data||[];
+el("sessions").innerHTML=rows.length?rows.map(s=>'<div class="session"><b>'+esc(s.title)+'</b><p class="muted">'+dateFa(s.session_date)+"، "+esc(String(s.start_time).slice(0,5))+"، "+esc(s.duration||"")+'</p>'+toman(s.fee)+'</div>').join(""):"هنوز سانس فعالی وجود ندارد.";
+el("session-select").innerHTML='<option value="">انتخاب سانس</option>'+rows.map(s=>'<option value="'+s.id+'">'+esc(s.title)+" - "+dateFa(s.session_date)+" "+esc(String(s.start_time).slice(0,5))+'</option>').join("");
+}
+el("refresh").onclick=loadSessions;
+el("reg").onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);const {error}=await sb.from("registrations").insert({session_id:f.get("session_id"),player_name:f.get("player_name").trim(),phone:f.get("phone").trim()});if(error){msg("ثبت‌نام ناموفق: "+error.message,true);return}msg("ثبت‌نام با موفقیت انجام شد. پرداخت پس از بررسی مدیر تأیید می‌شود.");e.target.reset();loadSessions()};
+function tab(a){el("player").classList.toggle("hidden",a);el("admin").classList.toggle("hidden",!a);if(a)checkAdmin()}
+el("player-tab").onclick=()=>tab(false);el("admin-tab").onclick=()=>tab(true);
+async function checkAdmin(){
+const {data:{session}}=await sb.auth.getSession();
+if(!session){el("login").classList.remove("hidden");el("panel").classList.add("hidden");return}
+const {data}=await sb.from("admin_users").select("user_id").eq("user_id",session.user.id).maybeSingle();
+if(!data){await sb.auth.signOut();msg("این حساب دسترسی مدیر ندارد.",true);return}
+el("login").classList.add("hidden");el("panel").classList.remove("hidden");loadAdmin()
+}
+el("login-form").onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);const {error}=await sb.auth.signInWithPassword({email:f.get("email"),password:f.get("password")});if(error){msg("ورود ناموفق بود؛ ایمیل یا رمز عبور را بررسی کنید.",true);return}checkAdmin()};
+el("logout").onclick=async()=>{await sb.auth.signOut();checkAdmin()};
+el("new-session").onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);const {error}=await sb.from("sessions").insert({title:f.get("title"),session_date:f.get("session_date"),start_time:f.get("start_time"),duration:f.get("duration"),fee:Number(f.get("fee")),is_open:true});if(error){msg("خطا: "+error.message,true);return}msg("سانس ایجاد شد.");e.target.reset();loadAdmin();loadSessions()};
+async function loadAdmin(){
+const {data:sessions,error}=await sb.from("sessions").select("*").order("session_date",{ascending:false});
+if(error){el("admin-sessions").textContent=error.message;return}
+let out="";
+for(const s of sessions||[]){
+const {data:r,error:re}=await sb.from("registrations").select("*").eq("session_id",s.id).order("created_at");
+out+='<div class="session"><b>'+esc(s.title)+'</b> — '+dateFa(s.session_date)+' '+esc(String(s.start_time).slice(0,5))+' — '+toman(s.fee)+' <div class="actions"><button class="alt" data-open="'+s.id+'" data-val="'+s.is_open+'">'+(s.is_open?"بستن ثبت‌نام":"بازکردن ثبت‌نام")+'</button></div>';
+if(re)out+='<p class="red">'+esc(re.message)+'</p>';
+else if(r?.length)out+='<div class="tablewrap"><table><tr><th>نام</th><th>تماس</th><th>مبلغ</th><th>پرداخت</th><th>عملیات</th></tr>'+r.map(x=>'<tr><td>'+esc(x.player_name)+'</td><td>'+esc(x.phone)+'</td><td>'+toman(x.amount)+'</td><td class="'+(x.paid?"pill":"red")+'">'+(x.paid?"پرداخت‌شده":"پرداخت‌نشده")+'</td><td><button data-paid="'+x.id+'" data-val="'+x.paid+'">'+(x.paid?"لغو تأیید":"تأیید پرداخت")+'</button></td></tr>').join("")+'</table></div>';
+else out+="<p class=muted>ثبت‌نامی وجود ندارد.</p>";
+out+="</div>";
+}
+el("admin-sessions").innerHTML=out||"سانسی وجود ندارد.";
+el("admin-sessions").querySelectorAll("[data-paid]").forEach(b=>b.onclick=async()=>{const {error}=await sb.from("registrations").update({paid:b.dataset.val!=="true"}).eq("id",b.dataset.paid);if(error)msg(error.message,true);loadAdmin()});
+el("admin-sessions").querySelectorAll("[data-open]").forEach(b=>b.onclick=async()=>{const {error}=await sb.from("sessions").update({is_open:b.dataset.val!=="true"}).eq("id",b.dataset.open);if(error)msg(error.message,true);loadAdmin();loadSessions()});
+}
+sb.auth.onAuthStateChange(()=>{if(!el("admin").classList.contains("hidden"))setTimeout(checkAdmin,0)});
+loadSessions();
+</script></body></html>
