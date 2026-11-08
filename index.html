@@ -64,6 +64,19 @@ table{width:100%;border-collapse:collapse;margin-top:12px;min-width:620px}td,th{
 @media(max-width:600px){.admin-summary{grid-template-columns:1fr 1fr}.admin-stat:last-child{grid-column:1/-1}.session-details{gap:8px 13px}.book-btn{width:100%}}
 .actions .danger{background:#a83232;box-shadow:0 3px 9px rgba(168,50,50,.16)}.actions .danger:hover{background:#c34242}
 @media(max-width:600px){header{height:260px;min-height:260px;background-position:center 25%}main{padding:15px 11px 40px}.card{padding:16px;border-radius:16px}button{padding:10px 13px}h2{font-size:18px}}
+
+/* Team composition */
+.team-controls{display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin:12px 0}
+.team-controls .field{flex:1;min-width:220px}
+.teams-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:16px}
+.team-box{background:linear-gradient(145deg,#15395d,#0a2039);border:1px solid #345678;border-radius:16px;padding:15px;min-width:0}
+.team-box h3{margin:0 0 12px;color:#ffad69;display:flex;justify-content:space-between;gap:8px}
+.team-player{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 10px;margin:7px 0;background:#071a30;border:1px solid #294563;border-radius:10px}
+.team-player span{overflow-wrap:anywhere}
+.team-player button{padding:5px 9px;font-size:12px;white-space:nowrap}
+.team-empty{color:#b7c6d8;font-size:13px;padding:8px}
+@media(max-width:600px){.teams-grid{grid-template-columns:1fr}.team-player{align-items:flex-start}}
+
 </style></head>
 <body>
 <header role="img" aria-label="سالن فوتسال؛ مشاهده سانس‌ها و ثبت‌نام آنلاین بازیکنان"><h1 class="sr-only">سالن فوتسال</h1></header>
@@ -90,6 +103,17 @@ table{width:100%;border-collapse:collapse;margin-top:12px;min-width:620px}td,th{
 <div class="field">هزینه (تومان)<input name="fee" type="number" min="0" value="0" required></div>
 </div><button>ثبت سانس</button></form></div>
 <div class="card"><h2>مدیریت ثبت‌نام‌ها و پرداخت</h2><div id="admin-sessions"></div></div>
+<div class="card" id="team-composition">
+  <h2>ترکیب‌بندی تیم‌ها</h2>
+  <p class="muted">سانس را انتخاب کن، بازیکنان را به‌صورت تصادفی و متعادل بین دو تیم تقسیم کن و در صورت نیاز آن‌ها را جابه‌جا کن.</p>
+  <div class="team-controls">
+    <div class="field">انتخاب سانس<select id="team-session-select"><option value="">در حال دریافت سانس‌ها…</option></select></div>
+    <button type="button" id="load-team-players" class="alt">نمایش بازیکنان</button>
+    <button type="button" id="shuffle-teams">تقسیم تصادفی</button>
+  </div>
+  <div id="team-message" class="muted">ابتدا یک سانس انتخاب کن.</div>
+  <div id="teams-output" class="teams-grid"></div>
+</div>
 </div></section>
 </main>
 <script>
@@ -119,7 +143,7 @@ const {data:{session}}=await sb.auth.getSession();
 if(!session){el("login").classList.remove("hidden");el("panel").classList.add("hidden");return}
 const {data}=await sb.from("admin_users").select("user_id").eq("user_id",session.user.id).maybeSingle();
 if(!data){await sb.auth.signOut();msg("این حساب دسترسی مدیر ندارد.",true);return}
-el("login").classList.add("hidden");el("panel").classList.remove("hidden");loadAdmin()
+el("login").classList.add("hidden");el("panel").classList.remove("hidden");loadAdmin();loadTeamSessions()
 }
 el("login-form").onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);const {error}=await sb.auth.signInWithPassword({email:f.get("email"),password:f.get("password")});if(error){msg("ورود ناموفق بود؛ ایمیل یا رمز عبور را بررسی کنید.",true);return}checkAdmin()};
 el("logout").onclick=async()=>{await sb.auth.signOut();checkAdmin()};
@@ -202,6 +226,59 @@ el("admin-sessions").querySelectorAll("[data-delete-player]").forEach(b=>b.oncli
 el("admin-sessions").querySelectorAll("[data-open]").forEach(b=>b.onclick=async()=>{const {error}=await sb.from("sessions").update({is_open:b.dataset.val!=="true"}).eq("id",b.dataset.open);if(error)msg(error.message,true);loadAdmin();loadSessions()});
 el("admin-sessions").querySelectorAll("[data-delete-session]").forEach(b=>b.onclick=async()=>{const title=b.dataset.title||"این سانس";if(!confirm('حذف «'+title+'»؟ تمام ثبت‌نام‌ها و اطلاعات پرداخت این سانس برای همیشه حذف می‌شوند.'))return;b.disabled=true;const {error:regError}=await sb.from("registrations").delete().eq("session_id",b.dataset.deleteSession);if(regError){msg("حذف ثبت‌نام‌ها ناموفق بود: "+regError.message,true);b.disabled=false;return}const {error}=await sb.from("sessions").delete().eq("id",b.dataset.deleteSession).eq("is_open",false);if(error){msg("ثبت‌نام‌ها حذف شدند اما حذف سانس ناموفق بود: "+error.message,true);b.disabled=false;loadAdmin();return}msg("سانس و تمام ثبت‌نام‌های آن حذف شدند.");loadAdmin();loadSessions()});
 }
+
+// Team composition is managed in the admin page; assignments are currently kept in page memory.
+let teamPlayers=[];
+let teamA=[];
+let teamB=[];
+let teamSessionId="";
+async function loadTeamSessions(){
+  const select=el("team-session-select");
+  const {data,error}=await sb.from("sessions").select("id,title,session_date,start_time").order("session_date",{ascending:false});
+  if(error){select.innerHTML='<option value="">خطا در دریافت سانس‌ها</option>';el("team-message").textContent=error.message;return}
+  select.innerHTML='<option value="">انتخاب سانس</option>'+(data||[]).map(s=>'<option value="'+esc(s.id)+'">'+esc(s.title)+' - '+dateFa(s.session_date)+' '+esc(String(s.start_time).slice(0,5))+'</option>').join("");
+}
+function renderTeams(){
+  const box=el("teams-output");
+  const teamHtml=(name,players,teamKey)=>'<div class="team-box"><h3><span>'+name+'</span><span>'+players.length.toLocaleString("fa-IR")+' نفر</span></h3>'+
+    (players.length?players.map((p,i)=>'<div class="team-player"><span>'+esc(p.player_name)+'</span><button type="button" class="alt" data-team-move="'+teamKey+'" data-player-index="'+i+'">انتقال به '+(teamKey==="a"?"تیم ۲":"تیم ۱")+'</button></div>').join(""):'<div class="team-empty">هنوز بازیکنی در این تیم نیست.</div>')+'</div>';
+  box.innerHTML=teamHtml("تیم ۱",teamA,"a")+teamHtml("تیم ۲",teamB,"b");
+  box.querySelectorAll("[data-team-move]").forEach(button=>button.onclick=()=>{
+    const source=button.dataset.teamMove==="a"?teamA:teamB;
+    const target=button.dataset.teamMove==="a"?teamB:teamA;
+    const index=Number(button.dataset.playerIndex);
+    if(!Number.isInteger(index)||index<0||index>=source.length)return;
+    target.push(source.splice(index,1)[0]);
+    renderTeams();
+  });
+}
+function randomizeTeams(){
+  const shuffled=[...teamPlayers];
+  for(let i=shuffled.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]]}
+  teamA=shuffled.filter((_,i)=>i%2===0);
+  teamB=shuffled.filter((_,i)=>i%2===1);
+  renderTeams();
+  el("team-message").textContent="بازیکنان به‌صورت تصادفی و با اختلاف حداکثر یک نفر تقسیم شدند.";
+}
+async function fetchTeamPlayers(){
+  teamSessionId=el("team-session-select").value;
+  if(!teamSessionId){el("team-message").textContent="لطفاً ابتدا یک سانس انتخاب کن.";el("teams-output").innerHTML="";return}
+  el("team-message").textContent="در حال دریافت بازیکنان…";
+  el("teams-output").innerHTML="";
+  const {data,error}=await sb.from("registrations").select("id,player_name,phone").eq("session_id",teamSessionId).order("created_at");
+  if(error){el("team-message").textContent="خطا در دریافت بازیکنان: "+error.message;return}
+  teamPlayers=data||[];
+  teamA=[];teamB=[];
+  if(!teamPlayers.length){el("team-message").textContent="برای این سانس هنوز بازیکنی ثبت‌نام نکرده است.";return}
+  el("team-message").textContent=teamPlayers.length.toLocaleString("fa-IR")+" بازیکن پیدا شد. برای تقسیم‌بندی، روی «تقسیم تصادفی» بزن.";
+  randomizeTeams();
+}
+el("load-team-players").onclick=fetchTeamPlayers;
+el("shuffle-teams").onclick=()=>{
+  if(!teamPlayers.length){el("team-message").textContent="ابتدا بازیکنان یک سانس را نمایش بده.";return}
+  randomizeTeams();
+};
+
 sb.auth.onAuthStateChange(()=>{if(!el("admin").classList.contains("hidden"))setTimeout(checkAdmin,0)});
 loadSessions();
 </script></body></html>
