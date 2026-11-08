@@ -85,11 +85,11 @@ table{width:100%;border-collapse:collapse;margin-top:12px;min-width:620px}td,th{
 .pitch-goal-top,.pitch-goal-bottom{position:absolute;left:39%;width:22%;height:3.5%;border:1px solid #ffffffa8}
 .pitch-goal-top{top:0;border-top:0}
 .pitch-goal-bottom{bottom:0;border-bottom:0}
-.pitch-player{position:absolute;transform:translate(-50%,-50%);width:76px;max-width:24%;display:flex;flex-direction:column;align-items:center;gap:3px;z-index:2;background:none;border:0;padding:0;box-shadow:none;color:white}
+.pitch-player{position:absolute;transform:translate(-50%,-50%);width:76px;max-width:24%;display:flex;flex-direction:column;align-items:center;gap:3px;z-index:2;background:none;border:0;padding:0;box-shadow:none;color:white;cursor:grab;touch-action:none;user-select:none}.pitch-player.dragging{z-index:10;cursor:grabbing;filter:drop-shadow(0 4px 7px #0009)}
 .pitch-player:hover{transform:translate(-50%,-50%) scale(1.06);box-shadow:none;background:none}
-.player-shirt{width:31px;height:31px;border-radius:10px 10px 8px 8px;background:linear-gradient(145deg,#ff9a37,#c94e08);border:2px solid #fff;display:grid;place-items:center;font-size:11px;font-weight:900;color:#fff;text-shadow:0 1px 2px #0008;box-shadow:0 3px 8px #0008}
+.player-shirt{width:31px;height:31px;border-radius:10px 10px 8px 8px;background:linear-gradient(145deg,#ff9a37,#c94e08);border:2px solid #fff;display:grid;place-items:center;box-shadow:0 3px 8px #0008;position:relative}.player-shirt:before{content:"";position:absolute;top:5px;left:5px;right:5px;height:7px;border-radius:5px 5px 2px 2px;background:#ffffff55}.player-shirt:after{content:"";position:absolute;left:50%;top:14px;width:4px;height:9px;transform:translateX(-50%);border-radius:3px;background:#ffffff55}
 .team-b .player-shirt{background:linear-gradient(145deg,#80d6ff,#1678b5)}
-.pitch-player.goalkeeper .player-shirt{background:linear-gradient(145deg,#f5d76e,#b88a12);color:#172337}
+.pitch-player.goalkeeper .player-shirt{background:linear-gradient(145deg,#f5d76e,#b88a12)}
 .player-name-tag{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:#061729eF;border:1px solid #ffffff66;border-radius:6px;padding:2px 5px;font-size:10px;line-height:1.4;text-shadow:none}
 .player-role{font-size:9px;color:#fff;background:#071a30d9;border-radius:20px;padding:1px 5px;line-height:1.3}
 .pitch-hint{text-align:center;color:#b9d6c8;font-size:11px;margin:8px 0 0}
@@ -257,6 +257,7 @@ let teamPlayers=[];
 let teamA=[];
 let teamB=[];
 let teamSessionId="";
+let customPlayerPositions={};
 async function loadTeamSessions(){
   const select=el("team-session-select");
   const {data,error}=await sb.from("sessions").select("id,title,session_date,start_time").order("session_date",{ascending:false});
@@ -274,37 +275,65 @@ function renderTeamCard(name,players,teamKey){
   const keeper=starters[0];
   const fieldPlayers=starters.slice(1);
   let markers="";
-  if(keeper){
-    markers+='<button type="button" class="pitch-player goalkeeper" style="left:50%;top:88%" data-team-move="'+teamKey+'" data-player-id="'+esc(keeper.id)+'" title="انتقال '+esc(keeper.player_name)+' به تیم مقابل"><span class="player-shirt">۱</span><span class="player-role">دروازه‌بان</span><span class="player-name-tag">'+esc(keeper.player_name)+'</span></button>';
-  }
-  fieldPlayers.forEach((player,index)=>{
-    const pos=positions[index]||positions[positions.length-1];
-    markers+='<button type="button" class="pitch-player" style="left:'+pos[0]+'%;top:'+pos[1]+'%" data-team-move="'+teamKey+'" data-player-id="'+esc(player.id)+'" title="انتقال '+esc(player.player_name)+' به تیم مقابل"><span class="player-shirt">'+(index+2).toLocaleString("fa-IR")+'</span><span class="player-name-tag">'+esc(player.player_name)+'</span></button>';
-  });
+  const playerMarker=(player,defaultPos,extraClass="",role="")=>{
+    const custom=customPlayerPositions[String(player.id)];
+    const pos=custom||defaultPos;
+    return '<button type="button" class="pitch-player '+extraClass+'" style="left:'+pos[0]+'%;top:'+pos[1]+'%" data-team-move="'+teamKey+'" data-player-id="'+esc(player.id)+'" title="برای جابجایی، بازیکن را بکش؛ برای انتقال لمس کن"><span class="player-shirt" aria-label="لباس بازیکن"></span>'+(role?'<span class="player-role">'+role+'</span>':'')+'<span class="player-name-tag">'+esc(player.player_name)+'</span></button>';
+  };
+  if(keeper) markers+=playerMarker(keeper,[50,88],"goalkeeper","دروازه‌بان");
+  fieldPlayers.forEach((player,index)=>{const pos=positions[index]||positions[positions.length-1];markers+=playerMarker(player,pos)});
   const bench=players.slice(5);
-  const benchHtml=bench.length?'<div class="bench-area"><div class="bench-title">ذخیره‌ها · '+bench.length.toLocaleString("fa-IR")+' نفر</div>'+bench.map(player=>'<div class="bench-player"><span>🪑 '+esc(player.player_name)+'</span><button type="button" class="alt" data-team-move="'+teamKey+'" data-player-id="'+esc(player.id)+'">انتقال</button></div>').join("")+'</div>':"";
+  const benchHtml=bench.length?'<div class="bench-area"><div class="bench-title">ذخیره‌ها · '+bench.length.toLocaleString("fa-IR")+' نفر</div>'+bench.map(player=>'<div class="bench-player"><span>🪑 '+esc(player.player_name)+'</span><button type="button" class="alt" data-team-move="'+teamKey+'" data-player-id="'+esc(player.id)+'">انتقال</button></div>').join('')+'</div>':"";
   return '<div class="team-box '+(teamKey==="b"?"team-b":"team-a")+'"><h3><span class="team-heading"><i class="team-color-dot"></i>'+name+'</span><span class="team-count">'+players.length.toLocaleString("fa-IR")+' بازیکن</span></h3>'+
-    '<div class="pitch-board"><div class="pitch-boundary"></div><div class="pitch-box-top"></div><div class="pitch-box-bottom"></div><div class="pitch-goal-top"></div><div class="pitch-goal-bottom"></div>'+markers+'</div>'+
-    '<div class="pitch-hint">برای انتقال بازیکن، روی بازیکن داخل زمین بزن</div>'+benchHtml+
+    '<div class="pitch-board" data-pitch="'+teamKey+'"><div class="pitch-boundary"></div><div class="pitch-box-top"></div><div class="pitch-box-bottom"></div><div class="pitch-goal-top"></div><div class="pitch-goal-bottom"></div>'+markers+'</div>'+
+    '<div class="pitch-hint">برای تغییر موقعیت، بازیکن را روی زمین بکش؛ برای انتقال به تیم مقابل، یک‌بار لمس کن</div>'+benchHtml+
     (players.length===0?'<div class="team-empty">بازیکنی در این تیم نیست.</div>':"")+'</div>';
 }
 function renderTeams(){
   const box=el("teams-output");
   box.innerHTML=renderTeamCard("تیم نارنجی",teamA,"a")+renderTeamCard("تیم آبی",teamB,"b");
-  box.querySelectorAll("[data-team-move]").forEach(button=>button.onclick=()=>{
-    const source=button.dataset.teamMove==="a"?teamA:teamB;
-    const target=button.dataset.teamMove==="a"?teamB:teamA;
-    const index=source.findIndex(p=>String(p.id)===String(button.dataset.playerId));
-    if(index<0)return;
-    target.push(source.splice(index,1)[0]);
-    renderTeams();
+  box.querySelectorAll("[data-team-move]").forEach(button=>{
+    if(!button.classList.contains("pitch-player")){
+      button.onclick=()=>movePlayerToOtherTeam(button.dataset.teamMove,button.dataset.playerId);
+      return;
+    }
+    let start=null,moved=false;
+    button.addEventListener("pointerdown",e=>{start={x:e.clientX,y:e.clientY};moved=false;button.setPointerCapture(e.pointerId);button.classList.add("dragging");e.preventDefault()});
+    button.addEventListener("pointermove",e=>{
+      if(!start)return;
+      const dx=e.clientX-start.x,dy=e.clientY-start.y;
+      if(Math.hypot(dx,dy)>5)moved=true;
+      if(!moved)return;
+      const pitch=button.closest(".pitch-board"),r=pitch.getBoundingClientRect();
+      const x=Math.max(8,Math.min(92,(e.clientX-r.left)/r.width*100));
+      const y=Math.max(7,Math.min(93,(e.clientY-r.top)/r.height*100));
+      button.style.left=x+"%";button.style.top=y+"%";
+      customPlayerPositions[String(button.dataset.playerId)]=[x,y];
+    });
+    const finish=e=>{
+      if(!start)return;
+      button.classList.remove("dragging");
+      if(!moved)movePlayerToOtherTeam(button.dataset.teamMove,button.dataset.playerId);
+      start=null;
+    };
+    button.addEventListener("pointerup",finish);
+    button.addEventListener("pointercancel",()=>{start=null;button.classList.remove("dragging")});
   });
+}
+function movePlayerToOtherTeam(teamKey,playerId){
+  const source=teamKey==="a"?teamA:teamB;
+  const target=teamKey==="a"?teamB:teamA;
+  const index=source.findIndex(p=>String(p.id)===String(playerId));
+  if(index<0)return;
+  target.push(source.splice(index,1)[0]);
+  renderTeams();
 }
 function randomizeTeams(){
   const shuffled=[...teamPlayers];
   for(let i=shuffled.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]]}
   teamA=shuffled.filter((_,i)=>i%2===0);
   teamB=shuffled.filter((_,i)=>i%2===1);
+  customPlayerPositions={};
   renderTeams();
   el("team-message").textContent="بازیکنان به‌صورت تصادفی و با اختلاف حداکثر یک نفر تقسیم شدند.";
 }
@@ -316,7 +345,7 @@ async function fetchTeamPlayers(){
   const {data,error}=await sb.from("registrations").select("id,player_name,phone").eq("session_id",teamSessionId).order("created_at");
   if(error){el("team-message").textContent="خطا در دریافت بازیکنان: "+error.message;return}
   teamPlayers=data||[];
-  teamA=[];teamB=[];
+  teamA=[];teamB=[];customPlayerPositions={};
   if(!teamPlayers.length){el("team-message").textContent="برای این سانس هنوز بازیکنی ثبت‌نام نکرده است.";return}
   el("team-message").textContent=teamPlayers.length.toLocaleString("fa-IR")+" بازیکن پیدا شد. برای تقسیم‌بندی، روی «تقسیم تصادفی» بزن.";
   randomizeTeams();
