@@ -76,7 +76,7 @@ table{width:100%;border-collapse:collapse;margin-top:12px;min-width:620px}td,th{
 <header id="top" class="site-header">
   <nav class="top-nav" aria-label="منوی اصلی">
     <a class="brand" href="#top"><span class="brand-ball">⚽</span><span>KARIMI<span class="brand-orange">SPORTS</span></span></a>
-    <div class="nav-links"><a href="#top">صفحه اصلی</a><a href="#sessions-card">سانس‌ها</a><a href="#reg">ثبت‌نام بازیکن</a><button type="button" class="nav-login" onclick="document.getElementById('admin-tab').click()">ورود مدیر</button></div>
+    <div class="nav-links"><a href="#sessions-card" id="home-nav">صفحه اصلی</a><a href="#sessions-card">سانس‌ها</a><a href="#reg">ثبت‌نام بازیکن</a><a href="#site-footer" id="contact-nav">ارتباط با ما</a><button type="button" class="nav-login" id="nav-admin-login">ورود مدیر</button></div>
   </nav>
   <div class="hero-wrap">
     <div class="hero-copy"><div class="hero-brandline">KARIMI<span>SPORTS</span></div><h1>سانس خودت رو <strong>رزرو کن!</strong></h1><p>سریع، آسان و بدون تماس تلفنی</p><a class="hero-cta" href="#sessions-card">مشاهده سانس‌ها <span>←</span></a></div>
@@ -109,7 +109,7 @@ table{width:100%;border-collapse:collapse;margin-top:12px;min-width:620px}td,th{
 
 </div></section>
 </main>
-<footer class="site-footer">
+<footer id="site-footer" class="site-footer">
   <div class="footer-glow footer-glow-one"></div>
   <div class="footer-glow footer-glow-two"></div>
   <div class="footer-pitch-lines" aria-hidden="true"></div>
@@ -219,7 +219,11 @@ el("session-select").innerHTML='<option value="">انتخاب سانس</option>'
 el("refresh").onclick=loadSessions;
 el("reg").onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);const {error}=await sb.from("registrations").insert({session_id:f.get("session_id"),player_name:f.get("player_name").trim(),phone:f.get("phone").trim()});if(error){msg("ثبت‌نام ناموفق: "+error.message,true);return}msg("ثبت‌نام با موفقیت انجام شد. پرداخت پس از بررسی مدیر تأیید می‌شود.");e.target.reset();loadSessions()};
 function tab(a){el("player").classList.toggle("hidden",a);el("admin").classList.toggle("hidden",!a);if(a)checkAdmin()}
-el("player-tab").onclick=()=>tab(false);el("admin-tab").onclick=()=>tab(true);
+function goToSection(target){target.scrollIntoView({behavior:"smooth",block:"start"})}
+el("player-tab").onclick=()=>{tab(false);setTimeout(()=>goToSection(el("sessions-card")),40)};
+el("admin-tab").onclick=()=>{tab(true);setTimeout(()=>goToSection(el("admin")),40)};
+el("nav-admin-login").onclick=()=>{tab(true);setTimeout(()=>goToSection(el("admin")),40)};
+el("home-nav").onclick=e=>{e.preventDefault();tab(false);setTimeout(()=>goToSection(el("sessions-card")),40)};
 async function checkAdmin(){
 const {data:{session}}=await sb.auth.getSession();
 if(!session){el("login").classList.remove("hidden");el("panel").classList.add("hidden");return}
