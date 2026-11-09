@@ -71,79 +71,54 @@ table{width:100%;border-collapse:collapse;margin-top:12px;min-width:620px}td,th{
 .actions .danger{background:#a83232;box-shadow:0 3px 9px rgba(168,50,50,.16)}.actions .danger:hover{background:#c34242}
 @media(max-width:600px){main{padding:15px 11px 40px}.card{padding:16px;border-radius:16px}button{padding:10px 13px}h2{font-size:18px}}
 
+/* Mobile refinement: contained full-width layout; desktop rules remain unchanged. */
+html,body{width:100%;max-width:100%;overflow-x:hidden}
+@media(max-width:760px){
+  .site-header{width:100%;overflow:hidden}
+  .top-nav{width:100%;min-width:0;display:flex;flex-direction:column;align-items:center;gap:12px;padding:14px 12px}
+  .brand{font-size:23px;gap:9px;justify-content:center}
+  .brand-ball{width:34px;height:34px;display:inline-flex;filter:drop-shadow(0 3px 7px #f8791766)}
+  .brand-ball svg{width:100%;height:100%;display:block}
+  .nav-links{width:100%;min-width:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .nav-links a,.nav-links .nav-login{min-width:0;width:100%;min-height:44px;display:flex;align-items:center;justify-content:center;text-align:center;padding:9px 7px;border-radius:12px;background:rgba(17,43,70,.82);border:1px solid rgba(119,157,190,.28);font-size:12px;line-height:1.45;white-space:normal}
+  .nav-links .nav-login{background:linear-gradient(135deg,#1c4771,#102844);border-color:#41698e}
+  .hero-wrap{width:100%;max-width:100%;min-width:0;grid-template-columns:minmax(0,1fr);padding:24px 16px 26px;gap:0}
+  .hero-copy{width:100%;min-width:0;text-align:center;overflow-wrap:anywhere}
+  .hero-brandline{font-size:clamp(22px,6vw,30px)}
+  .hero-copy h1{font-size:clamp(29px,8.5vw,40px);line-height:1.5;overflow-wrap:anywhere}
+  .hero-copy p{font-size:14px;line-height:1.9}
+  .hero-cta{max-width:100%;justify-content:center;gap:10px;padding:12px 17px;font-size:15px}
+  .hero-art{width:100%;max-width:100%;height:clamp(180px,58vw,250px);background-position:center;background-size:contain}
+  main{width:100%;max-width:100%;min-width:0;padding:15px 12px 38px}
+  .card{width:100%;min-width:0;margin:12px 0;padding:15px}
+  .grid{grid-template-columns:minmax(0,1fr)}
+  .session,.public-session{min-width:0;padding:15px}
+  .session-top,.session-bottom{align-items:stretch}
+  .session-title{font-size:16px}
+  .session-details{font-size:12px;gap:8px 12px}
+  .book-btn{width:100%;min-height:44px}
+  input,select,button{font-size:16px;max-width:100%}
+  .tabs,.actions{gap:8px}
+  .tabs button,.actions button{min-height:44px}
+  .tablewrap{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+}
+@media(max-width:390px){
+  .top-nav{padding-inline:10px}
+  .nav-links{gap:7px}
+  .nav-links a,.nav-links .nav-login{font-size:11px;padding-inline:5px}
+  .hero-wrap{padding-inline:12px}
+  .hero-copy h1{font-size:29px}
+  .hero-cta{font-size:14px;padding-inline:12px}
+  main{padding-inline:9px}
+  .card{padding:13px}
+}
 
-/* Responsive polish: desktop, tablet and small phones */
-html{scroll-padding-top:16px;-webkit-text-size-adjust:100%}
-img,svg,video{max-width:100%;height:auto}
-button,a,input,select{touch-action:manipulation}
-button,a{ -webkit-tap-highlight-color:transparent }
-button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #ffb15c;outline-offset:3px}
-.tablewrap{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
-.tablewrap table{white-space:nowrap}
-.session-details span{min-width:0}
-@media (min-width:761px) and (max-width:1024px){
- .top-nav{padding-inline:24px;gap:14px}
- .nav-links{gap:14px}
- .hero-wrap{padding-inline:28px;gap:8px}
- .hero-art{height:350px}
- main{padding-inline:22px}
- .card{padding:20px}
-}
-@media (max-width:760px){
- .site-header{overflow:visible}
- .top-nav{position:relative;gap:10px;padding:12px 14px}
- .brand{font-size:20px;gap:7px}
- .brand-ball{font-size:29px}
- .nav-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;gap:8px;margin-top:5px}
- .nav-links a,.nav-links button{display:flex;align-items:center;justify-content:center;min-height:42px;padding:8px 7px;text-align:center;border-radius:10px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.1);font-size:12px}
- .nav-links .nav-login{width:100%;background:linear-gradient(135deg,#183b63,#102844);border-color:#46698e}
- .hero-wrap{grid-template-columns:minmax(0,1fr);min-height:0;padding:25px 16px 24px;gap:4px}
- .hero-copy{grid-row:1;padding:5px 0}
- .hero-copy h1{font-size:clamp(32px,8.5vw,46px);line-height:1.35}
- .hero-brandline{font-size:25px;margin-bottom:8px}
- .hero-copy p{font-size:14px}
- .hero-cta{font-size:15px;padding:11px 20px}
- .hero-art{grid-row:2;width:100%;height:clamp(170px,52vw,260px);background-position:center;background-size:contain}
- main{width:100%;padding:12px 10px 34px}
- .card{margin:12px 0;padding:15px 13px;border-radius:15px}
- .grid{grid-template-columns:minmax(0,1fr);gap:7px}
- .field{margin:7px 0}
- input,select{min-height:46px;font-size:16px}
- button{min-height:44px;padding:10px 13px;font-size:14px}
- .tabs button,.actions button{flex:1 1 auto}
- .session{padding:14px 13px}
- .session-title{font-size:16px}
- .session-details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 10px;font-size:12px}
- .session-bottom{align-items:stretch;flex-direction:column}
- .book-btn{width:100%;min-height:46px}
- .admin-summary{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
- .admin-stat{padding:12px 8px}
- .admin-stat strong{font-size:20px}
- .admin-stat span{font-size:11px}
- .admin-stat:last-child{grid-column:1/-1}
- .admin-session .actions{display:grid;grid-template-columns:1fr;gap:8px}
- .admin-session .actions button{width:100%}
- .tablewrap{margin-inline:-2px;border-radius:10px}
- .tablewrap table{min-width:590px}
- #admin-sessions h3{line-height:1.8}
- .notice{font-size:13px;overflow-wrap:anywhere}
-}
-@media(max-width:380px){
- .brand{font-size:18px}
- .nav-links a,.nav-links button{font-size:11px}
- .hero-copy h1{font-size:31px}
- .session-details{grid-template-columns:1fr}
- .admin-summary{grid-template-columns:1fr 1fr}
- .admin-stat strong{font-size:18px}
- .card{padding:13px 11px}
-}
-@media(hover:none){button:hover,.session:hover,.footer-socials a:hover{transform:none;filter:none}}
-@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
 </style></head>
 <body>
 <header id="top" class="site-header">
   <nav class="top-nav" aria-label="منوی اصلی">
-    <a class="brand" href="#top"><span class="brand-ball">⚽</span><span>KARIMI<span class="brand-orange">SPORTS</span></span></a>
+    <a class="brand" href="#top"><span class="brand-ball" aria-hidden="true"><svg viewBox="0 0 64 64" role="img"><circle cx="32" cy="32" r="29" fill="#f7f9fc" stroke="#ff8a1c" stroke-width="3"/><path d="M32 17 42 24 38 36 26 36 22 24Z" fill="#102b4c"/><path d="m32 3 0 14m25 7-15 0m10 24-14-12M32 61V36M7 48l15-12M7 24l15 0" fill="none" stroke="#102b4c" stroke-width="3" stroke-linecap="round"/><path d="m22 24-9-9m29 9 9-9m-25 21-4 15m16-15 4 15" fill="none" stroke="#102b4c" stroke-width="3" stroke-linecap="round"/></svg></span><span>KARIMI<span class="brand-orange">SPORTS</span></span></a>
     <div class="nav-links"><a href="#sessions-card" id="home-nav">صفحه اصلی</a><a href="#sessions-card">سانس‌ها</a><a href="#reg">ثبت‌نام بازیکن</a><a href="#site-footer" id="contact-nav">ارتباط با ما</a><button type="button" class="nav-login" id="nav-admin-login">ورود مدیر</button></div>
   </nav>
   <div class="hero-wrap">
