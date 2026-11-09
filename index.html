@@ -114,6 +114,36 @@ html,body{width:100%;max-width:100%;overflow-x:hidden}
 }
 
 
+/* Final narrow-device width guard: keeps every section inside the real viewport. */
+*,*::before,*::after{min-width:0}
+img,svg,video,canvas{max-width:100%;height:auto}
+@media(max-width:760px){
+  html,body{width:100%;min-width:0;margin:0;padding:0;overflow-x:clip}
+  body{position:relative}
+  .site-header,main,.site-footer{width:100%;max-width:100%;min-width:0;margin-inline:0}
+  .top-nav,.hero-wrap,.footer-inner,.footer-main{width:100%;max-width:100%;min-width:0}
+  .top-nav>* , .nav-links>* , .hero-wrap>* , main>* , .site-footer *{min-width:0;max-width:100%}
+  .nav-links{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .hero-wrap{padding-left:clamp(10px,3.5vw,16px);padding-right:clamp(10px,3.5vw,16px)}
+  .hero-copy,.hero-art,.card,.session,.public-session,.admin-session{min-width:0;max-width:100%}
+  .grid,.row,.tabs,.actions,.admin-summary,.session-top,.session-bottom{min-width:0;max-width:100%}
+  .field,input,select,textarea,button{min-width:0;max-width:100%}
+  .footer-main{grid-template-columns:minmax(0,1fr)}
+  .footer-socials{width:100%;max-width:100%;flex-wrap:wrap}
+  .footer-socials a{min-width:0;max-width:100%;flex:1 1 135px}
+  .tablewrap{width:100%;max-width:100%;overflow-x:auto}
+}
+@media(max-width:360px){
+  .top-nav{padding-inline:8px}
+  .nav-links{gap:6px}
+  .nav-links a,.nav-links .nav-login{font-size:10px;padding-inline:4px}
+  .hero-copy h1{font-size:clamp(25px,8vw,29px)}
+  .hero-cta{white-space:normal}
+  main{padding-inline:7px}
+  .card{padding:11px}
+}
+
+
 </style></head>
 <body>
 <header id="top" class="site-header">
