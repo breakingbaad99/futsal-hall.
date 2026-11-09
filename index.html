@@ -2,7 +2,7 @@
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>رزرو سانس باشگاه</title>
+<title>KarimiSports | رزرو سانس</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css">
@@ -14,8 +14,14 @@
 :root{--navy:#07172d;--navy2:#102b4c;--navy3:#17395f;--orange:#d65b0b;--orange2:#ff790d;--paper:#07172d;--ink:#f4f7fb;--muted:#b7c6d8;--line:#28476a}
 html{scroll-behavior:smooth}
 body{margin:0;background:radial-gradient(ellipse at 50% 0%,#17395f 0%,#07172d 58%);color:var(--ink);font-family:Tahoma,Arial,sans-serif;line-height:1.7}
-header{height:clamp(340px,31vw,430px);min-height:340px;background:#06152a url('futsal-hero.jpg') center 25%/cover no-repeat;border-bottom:4px solid var(--orange);position:relative;overflow:hidden}
-header:after{content:"";position:absolute;inset:auto 0 0;height:45px;background:linear-gradient(transparent,rgba(3,13,28,.42));pointer-events:none}
+.site-header{min-height:590px;background:radial-gradient(ellipse at 72% 65%,#12385d 0%,#06172d 54%,#020b18 100%);border-bottom:3px solid #f17b19;position:relative;overflow:hidden}
+.top-nav{height:88px;display:flex;align-items:center;justify-content:space-between;gap:22px;padding:0 clamp(18px,5vw,76px);background:rgba(1,10,22,.82);border-bottom:1px solid rgba(255,255,255,.08);position:relative;z-index:2;backdrop-filter:blur(12px)}
+.brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;font:bold italic clamp(19px,2.2vw,30px) Arial,sans-serif;letter-spacing:-1px;white-space:nowrap}.brand-orange,.hero-brandline span{color:#ff851b}.brand-ball{font-size:35px;filter:drop-shadow(0 0 9px #f87917)}
+.nav-links{display:flex;align-items:center;gap:clamp(12px,2.5vw,34px)}.nav-links a{color:#e8eef6;text-decoration:none;font-weight:700;font-size:14px;transition:.2s}.nav-links a:hover{color:#ff941f}.nav-login{padding:9px 19px;border-radius:28px;background:linear-gradient(135deg,#173c63,#0b2039);border:1px solid #315d86;box-shadow:none;font-size:13px}
+.hero-wrap{max-width:1250px;min-height:500px;margin:auto;padding:45px 5vw 55px;display:grid;grid-template-columns:1.02fr .98fr;align-items:center;gap:12px;position:relative}.hero-wrap:before{content:"";position:absolute;width:420px;height:420px;right:8%;top:10%;background:#f47713;filter:blur(130px);opacity:.13;pointer-events:none}.hero-copy{position:relative;z-index:1;text-align:right;padding:12px 0}.hero-brandline{font:bold italic clamp(23px,3vw,38px) Arial,sans-serif;letter-spacing:-1px;color:#f5f7fa;margin-bottom:14px}.hero-copy h1{font-size:clamp(34px,5vw,66px);line-height:1.45;color:#fff;margin:0 0 10px;text-shadow:0 8px 22px #0008}.hero-copy h1 strong{display:block;color:#ff8b19;font-weight:900;text-shadow:0 0 25px #f47a1b55}.hero-copy p{color:#e5edf7;font-size:clamp(15px,1.7vw,21px);font-weight:700;margin:14px 0 27px}.hero-cta{display:inline-flex;align-items:center;gap:18px;padding:13px 28px;border-radius:16px;color:#111d2a;text-decoration:none;font-weight:900;font-size:17px;background:linear-gradient(120deg,#ffb12b,#f4770c);box-shadow:0 0 0 1px #ffcc7a,0 9px 30px #f4771766;transition:.2s}.hero-cta:hover{transform:translateY(-3px);box-shadow:0 0 0 1px #ffcc7a,0 13px 36px #f4771788}.hero-cta span{font-size:24px}
+.hero-art{height:420px;min-width:0;background:url('karimisports-hero-player.png') left center/contain no-repeat;filter:drop-shadow(0 20px 30px #0008)}
+@media(max-width:760px){.site-header{min-height:0}.top-nav{height:auto;min-height:76px;flex-wrap:wrap;padding:12px 18px}.nav-links{width:100%;justify-content:space-between;gap:8px;flex-wrap:wrap}.nav-links a{font-size:12px}.nav-login{padding:7px 12px;font-size:12px}.hero-wrap{grid-template-columns:1fr;padding:22px 20px 30px;gap:0}.hero-copy{text-align:center;grid-row:1}.hero-copy h1{font-size:clamp(34px,9vw,52px)}.hero-art{height:260px;background-position:center}.hero-copy p{margin:7px 0 18px}}
+
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 main{max-width:1120px;margin:auto;padding:22px 16px 55px;position:relative}
 .card{background:linear-gradient(145deg,rgba(13,37,67,.98),rgba(5,20,39,.98));border:1px solid #294c73;border-radius:20px;padding:22px;margin:16px 0;box-shadow:0 12px 32px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.035)}
@@ -63,50 +69,25 @@ table{width:100%;border-collapse:collapse;margin-top:12px;min-width:620px}td,th{
 .actions .danger{background:#a83232;box-shadow:0 3px 9px rgba(168,50,50,.16)}.actions .danger:hover{background:#c34242}
 @media(max-width:600px){.admin-summary{grid-template-columns:1fr 1fr}.admin-stat:last-child{grid-column:1/-1}.session-details{gap:8px 13px}.book-btn{width:100%}}
 .actions .danger{background:#a83232;box-shadow:0 3px 9px rgba(168,50,50,.16)}.actions .danger:hover{background:#c34242}
-@media(max-width:600px){header{height:260px;min-height:260px;background-position:center 25%}main{padding:15px 11px 40px}.card{padding:16px;border-radius:16px}button{padding:10px 13px}h2{font-size:18px}}
+@media(max-width:600px){main{padding:15px 11px 40px}.card{padding:16px;border-radius:16px}button{padding:10px 13px}h2{font-size:18px}}
 
-/* Football-style team formation board */
-.team-controls{display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin:12px 0}
-.team-controls .field{flex:1;min-width:190px}
-.teams-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:18px}
-.team-box{background:linear-gradient(155deg,#102d4b,#071a30);border:1px solid #345678;border-radius:18px;padding:15px;min-width:0;overflow:hidden}
-.team-box h3{margin:0 0 13px;color:#fff;display:flex;justify-content:space-between;align-items:center;gap:8px}
-.team-heading{display:flex;align-items:center;gap:9px}
-.team-color-dot{width:11px;height:11px;border-radius:50%;background:#ff8a24;box-shadow:0 0 0 4px rgba(255,138,36,.15)}
-.team-box.team-b .team-color-dot{background:#65c7ff;box-shadow:0 0 0 4px rgba(101,199,255,.15)}
-.team-count{font-size:12px;color:#d4e2f1;background:#ffffff12;border:1px solid #ffffff20;padding:4px 9px;border-radius:30px}
-.pitch-board{position:relative;width:100%;max-width:390px;margin:0 auto;aspect-ratio: .78;border:2px solid rgba(255,255,255,.78);border-radius:9px;overflow:hidden;background:repeating-linear-gradient(0deg,#197348 0px,#197348 62px,#1c8050 62px,#1c8050 124px);box-shadow:0 12px 24px #0005}
-.pitch-board:before{content:"";position:absolute;inset:50% 0 auto;height:1px;background:#ffffffa8}
-.pitch-board:after{content:"";position:absolute;width:31%;aspect-ratio:1;border:1px solid #ffffffa8;border-radius:50%;left:50%;top:50%;transform:translate(-50%,-50%)}
-.pitch-boundary{position:absolute;inset:0;border:1px solid #ffffffa8;pointer-events:none}
-.pitch-box-top,.pitch-box-bottom{position:absolute;left:25%;width:50%;height:15%;border:1px solid #ffffffa8}
-.pitch-box-top{top:0;border-top:0}
-.pitch-box-bottom{bottom:0;border-bottom:0}
-.pitch-goal-top,.pitch-goal-bottom{position:absolute;left:39%;width:22%;height:3.5%;border:1px solid #ffffffa8}
-.pitch-goal-top{top:0;border-top:0}
-.pitch-goal-bottom{bottom:0;border-bottom:0}
-.pitch-player{position:absolute;transform:translate(-50%,-50%);width:76px;max-width:24%;display:flex;flex-direction:column;align-items:center;gap:3px;z-index:2;background:none;border:0;padding:0;box-shadow:none;color:white;cursor:grab;touch-action:none;user-select:none}.pitch-player.dragging{z-index:10;cursor:grabbing;filter:drop-shadow(0 4px 7px #0009)}
-.pitch-player:hover{transform:translate(-50%,-50%) scale(1.06);box-shadow:none;background:none}
-.player-shirt{width:31px;height:31px;border-radius:10px 10px 8px 8px;background:linear-gradient(145deg,#ff9a37,#c94e08);border:2px solid #fff;display:grid;place-items:center;box-shadow:0 3px 8px #0008;position:relative}.player-shirt:before{content:"";position:absolute;top:5px;left:5px;right:5px;height:7px;border-radius:5px 5px 2px 2px;background:#ffffff55}.player-shirt:after{content:"";position:absolute;left:50%;top:14px;width:4px;height:9px;transform:translateX(-50%);border-radius:3px;background:#ffffff55}
-.team-b .player-shirt{background:linear-gradient(145deg,#80d6ff,#1678b5)}
-.player-name-tag{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:#061729eF;border:1px solid #ffffff66;border-radius:6px;padding:2px 5px;font-size:10px;line-height:1.4;text-shadow:none}
-.pitch-hint{text-align:center;color:#b9d6c8;font-size:11px;margin:8px 0 0}
-.bench-area{margin-top:13px;padding:11px;border:1px dashed #52718e;border-radius:12px;background:#06182b88}
-.bench-title{font-size:12px;color:#ffbf88;font-weight:800;margin-bottom:8px}
-.bench-player{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 9px;margin:5px 0;background:#0a2139;border:1px solid #2d4e6d;border-radius:9px;font-size:12px}
-.bench-player span{min-width:0;overflow-wrap:anywhere}
-.bench-player button{padding:4px 8px;font-size:11px;white-space:nowrap}
-.team-empty{color:#e2eee8;font-size:13px;padding:8px;text-align:center}
-@media(max-width:700px){.teams-grid{grid-template-columns:1fr}.pitch-board{max-width:340px}}
-@media(max-width:420px){.pitch-player{width:66px}.player-shirt{width:28px;height:28px}.player-name-tag{font-size:9px}.team-box{padding:11px}}
 </style></head>
 <body>
-<header role="img" aria-label="سالن فوتسال؛ مشاهده سانس‌ها و ثبت‌نام آنلاین بازیکنان"><h1 class="sr-only">سالن فوتسال</h1></header>
+<header id="top" class="site-header">
+  <nav class="top-nav" aria-label="منوی اصلی">
+    <a class="brand" href="#top"><span class="brand-ball">⚽</span><span>KARIMI<span class="brand-orange">SPORTS</span></span></a>
+    <div class="nav-links"><a href="#top">صفحه اصلی</a><a href="#sessions-card">سانس‌ها</a><a href="#reg">ثبت‌نام بازیکن</a><button type="button" class="nav-login" onclick="document.getElementById('admin-tab').click()">ورود مدیر</button></div>
+  </nav>
+  <div class="hero-wrap">
+    <div class="hero-copy"><div class="hero-brandline">KARIMI<span>SPORTS</span></div><h1>سانس خودت رو <strong>رزرو کن!</strong></h1><p>سریع، آسان و بدون تماس تلفنی</p><a class="hero-cta" href="#sessions-card">مشاهده سانس‌ها <span>←</span></a></div>
+    <div class="hero-art" role="img" aria-label="بازیکن فوتسال در حال شوت کردن توپ"></div>
+  </div>
+</header>
 <main>
 <div class="tabs"><button id="player-tab">سانس‌ها و ثبت‌نام</button><button class="alt" id="admin-tab">ورود مدیر</button></div>
 <div id="notice" class="hidden"></div>
 <section id="player">
-<div class="card"><h2>سانس‌های فعال</h2><div id="sessions">در حال دریافت…</div><button class="alt" id="refresh">به‌روزرسانی</button></div>
+<div class="card" id="sessions-card"><h2>سانس‌های فعال</h2><div id="sessions">در حال دریافت…</div><button class="alt" id="refresh">به‌روزرسانی</button></div>
 <div class="card"><h2>ثبت‌نام بازیکن</h2><form id="reg"><div class="grid">
 <div class="field">نام و نام خانوادگی<input name="player_name" required maxlength="100"></div>
 <div class="field">شماره تماس<input name="phone" required maxlength="30"></div>
@@ -125,43 +106,98 @@ table{width:100%;border-collapse:collapse;margin-top:12px;min-width:620px}td,th{
 <div class="field">هزینه (تومان)<input name="fee" type="number" min="0" value="0" required></div>
 </div><button>ثبت سانس</button></form></div>
 <div class="card"><h2>مدیریت ثبت‌نام‌ها و پرداخت</h2><div id="admin-sessions"></div></div>
-<div class="card" id="team-composition">
-  <h2>ترکیب‌بندی تیم‌ها</h2>
-  <p class="muted">سانس را انتخاب کن، بازیکنان را به‌صورت تصادفی و متعادل بین دو تیم تقسیم کن و در صورت نیاز آن‌ها را جابه‌جا کن.</p>
-  <div class="team-controls">
-    <div class="field">انتخاب سانس<select id="team-session-select"><option value="">در حال دریافت سانس‌ها…</option></select></div>
-    <div class="field">آرایش تیم‌ها<select id="team-formation"><option value="2-2">۲-۲ (متعادل)</option><option value="1-2-1">۱-۲-۱ (لوزی)</option><option value="3-1">۳-۱ (هجومی)</option></select></div>
-    <button type="button" id="load-team-players" class="alt">نمایش بازیکنان</button>
-    <button type="button" id="shuffle-teams">تقسیم تصادفی</button>
-  </div>
-  <div id="team-message" class="muted">ابتدا یک سانس انتخاب کن.</div>
-  <div id="teams-output" class="teams-grid"></div>
-</div>
+
 </div></section>
 </main>
 <footer class="site-footer">
+  <div class="footer-glow footer-glow-one"></div>
+  <div class="footer-glow footer-glow-two"></div>
+  <div class="footer-pitch-lines" aria-hidden="true"></div>
   <div class="footer-inner">
-    <div class="footer-brand"><span class="footer-code-icon">&lt;/&gt;</span><div><strong>طراحی و توسعه KarimiSports</strong><span>معرفی برنامه‌نویس وب‌سایت</span></div></div>
-    <div class="footer-person">
-      <h3>فردین کریمی</h3>
-      <p>طراح و برنامه‌نویس وب | Web Developer</p>
-      <div class="footer-links">
-        <a href="https://t.me/fardnkarimi" target="_blank" rel="noopener noreferrer" aria-label="تلگرام">✈ تلگرام: @fardnkarimi</a>
-        <a href="https://instagram.com/fardnkarimi" target="_blank" rel="noopener noreferrer" aria-label="اینستاگرام">◎ اینستاگرام: @fardnkarimi</a>
-        <a href="tel:09218816346" aria-label="تماس تلفنی">☎ تماس: 09218816346</a>
+    <div class="footer-topline">
+      <span class="footer-kicker"><span class="footer-kicker-dot"></span> FOOTBALL • DESIGN • DEVELOPMENT</span>
+      <span class="footer-season">KARIMISPORTS / 2026</span>
+    </div>
+    <div class="footer-main">
+      <div class="footer-brand">
+        <div class="footer-emblem" aria-hidden="true"><span>⚽</span></div>
+        <div class="footer-brand-copy">
+          <strong>KARIMI<span>SPORTS</span></strong>
+          <small>سامانه رزرو سانس فوتسال</small>
+        </div>
+      </div>
+      <div class="footer-person">
+        <span class="footer-eyebrow">DESIGNED &amp; DEVELOPED BY</span>
+        <h3>فردین کریمی</h3>
+        <p>طراح و برنامه‌نویس وب‌سایت</p>
+        <div class="footer-socials">
+          <a href="https://t.me/fardnkarimi" target="_blank" rel="noopener noreferrer" aria-label="تلگرام فردین کریمی">
+            <span class="footer-social-icon">➤</span><span><small>TELEGRAM</small><b>@fardnkarimi</b></span>
+          </a>
+          <a href="https://instagram.com/fardnkarimi" target="_blank" rel="noopener noreferrer" aria-label="اینستاگرام فردین کریمی">
+            <span class="footer-social-icon">◎</span><span><small>INSTAGRAM</small><b>@fardnkarimi</b></span>
+          </a>
+          <a href="tel:09218816346" aria-label="تماس با فردین کریمی">
+            <span class="footer-social-icon">☎</span><span><small>PHONE</small><b dir="ltr">09218816346</b></span>
+          </a>
+        </div>
+      </div>
+      <div class="footer-side-note">
+        <span class="footer-side-ball">⚽</span>
+        <strong>PLAY WITH PASSION</strong>
+        <small>ساخته‌شده برای عاشقان فوتسال</small>
       </div>
     </div>
-    <div class="footer-copy">Designed &amp; Developed by Fardin Karimi<br>© 2026 KarimiSports · تمامی حقوق محفوظ است</div>
+    <div class="footer-bottom">
+      <span>© 2026 KarimiSports · تمامی حقوق محفوظ است</span>
+      <span class="footer-credit">CRAFTED WITH <i>♥</i> BY FARDIN KARIMI</span>
+    </div>
   </div>
 </footer>
 <style>
-.site-footer{margin-top:34px;background:linear-gradient(135deg,#102b4c,#061426);border-top:3px solid var(--orange2);color:#eef5fc;padding:28px 16px 18px}
-.footer-inner{max-width:1120px;margin:auto;display:grid;grid-template-columns:1fr 1.3fr 1fr;gap:22px;align-items:center}
-.footer-brand{display:flex;align-items:center;gap:12px}.footer-code-icon{width:46px;height:46px;display:grid;place-items:center;border-radius:13px;background:linear-gradient(135deg,#ed791a,#bd4807);font-weight:900;font-size:18px}.footer-brand strong,.footer-brand span{display:block}.footer-brand strong{font-size:14px}.footer-brand div span{font-size:11px;color:#b9c9d9;margin-top:3px}
-.footer-person{text-align:center}.footer-person h3{margin:0;color:#ffad68;font-size:19px}.footer-person p{margin:2px 0 10px;color:#c5d3e1;font-size:12px}.footer-links{display:flex;justify-content:center;gap:8px 16px;flex-wrap:wrap}.footer-links a{color:#e5eef8;text-decoration:none;font-size:12px}.footer-links a:hover{color:#ffad68;text-decoration:underline}.footer-copy{text-align:left;color:#aebfd0;font-size:11px;line-height:1.9}
-@media(max-width:700px){.footer-inner{grid-template-columns:1fr;text-align:center;gap:17px}.footer-brand{justify-content:center}.footer-copy{text-align:center}}
+.site-footer{position:relative;isolation:isolate;overflow:hidden;margin-top:48px;padding:30px 20px 17px;color:#f6f8fc;background:radial-gradient(ellipse at 50% -25%,#25445a 0%,#10283a 42%,#071522 100%);border-top:1px solid rgba(255,159,74,.72);box-shadow:0 -18px 55px rgba(2,10,20,.18)}
+.site-footer:before{content:"";position:absolute;inset:0;z-index:-2;opacity:.13;background-image:linear-gradient(rgba(255,255,255,.11) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.11) 1px,transparent 1px);background-size:42px 42px;mask-image:linear-gradient(to bottom,black,transparent 88%)}
+.site-footer:after{content:"";position:absolute;z-index:-1;inset:auto 0 0;height:3px;background:linear-gradient(90deg,transparent,#f18a35,#ffd39a,#f18a35,transparent);background-size:200% 100%;animation:footerShimmer 7s linear infinite}
+.footer-inner{max-width:1160px;margin:auto;position:relative}
+.footer-glow{position:absolute;width:240px;height:240px;border-radius:50%;filter:blur(65px);opacity:.15;pointer-events:none;z-index:-1}
+.footer-glow-one{background:#f28a37;top:10px;right:-80px}.footer-glow-two{background:#2789b9;bottom:-100px;left:12%}
+.footer-pitch-lines{position:absolute;left:50%;top:50%;width:min(520px,75vw);height:230px;transform:translate(-50%,-35%);border:1px solid rgba(218,237,247,.055);border-radius:48%;pointer-events:none}
+.footer-pitch-lines:before{content:"";position:absolute;left:50%;top:0;bottom:0;border-left:1px solid rgba(218,237,247,.055)}
+.footer-pitch-lines:after{content:"";position:absolute;width:76px;height:76px;border:1px solid rgba(218,237,247,.055);border-radius:50%;left:50%;top:50%;transform:translate(-50%,-50%)}
+.footer-topline{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:17px;border-bottom:1px solid rgba(202,221,235,.13)}
+.footer-kicker,.footer-season{font-size:9px;letter-spacing:2px;color:#9eb2c2;font-weight:800}
+.footer-kicker{display:flex;align-items:center;gap:8px}.footer-kicker-dot{width:7px;height:7px;border-radius:50%;background:#f59a4b;box-shadow:0 0 12px #f59a4b;animation:footerPulse 2s ease-in-out infinite}
+.footer-main{display:grid;grid-template-columns:1fr 1.55fr 1fr;align-items:center;gap:28px;padding:28px 0 25px}
+.footer-brand{display:flex;align-items:center;gap:13px}
+.footer-emblem{width:64px;height:64px;display:grid;place-items:center;border-radius:19px;background:linear-gradient(145deg,#ffb46d,#d65e16 70%);box-shadow:0 9px 24px rgba(226,105,31,.24),inset 0 1px 0 rgba(255,255,255,.55);transform:rotate(-5deg);transition:transform .35s,box-shadow .35s}
+.footer-emblem span{font-size:35px;filter:drop-shadow(0 3px 3px #632b12)}
+.footer-brand:hover .footer-emblem{transform:rotate(5deg) translateY(-3px);box-shadow:0 13px 30px rgba(226,105,31,.35)}
+.footer-brand-copy strong{display:block;font-size:19px;letter-spacing:1.2px;font-weight:950;color:#fff}.footer-brand-copy strong span{color:#ffab61}
+.footer-brand-copy small{display:block;margin-top:5px;color:#a9bdcc;font-size:11px}
+.footer-person{text-align:center}
+.footer-eyebrow{font-size:9px;letter-spacing:2.1px;color:#ffb16d;font-weight:900}
+.footer-person h3{margin:7px 0 2px;color:#fff;font-size:25px;font-weight:900;text-shadow:0 0 22px rgba(255,161,86,.2)}
+.footer-person p{margin:0 0 17px;color:#b9c9d5;font-size:12px}
+.footer-socials{display:flex;justify-content:center;gap:9px;flex-wrap:wrap}
+.footer-socials a{display:flex;align-items:center;gap:8px;min-width:122px;padding:9px 11px;text-align:right;text-decoration:none;color:#f2f6fa;background:linear-gradient(145deg,rgba(255,255,255,.085),rgba(255,255,255,.025));border:1px solid rgba(214,231,242,.15);border-radius:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06);transition:transform .25s,border-color .25s,background .25s}
+.footer-socials a:hover{transform:translateY(-4px);border-color:rgba(255,174,104,.75);background:rgba(245,139,57,.13)}
+.footer-social-icon{width:30px;height:30px;flex:0 0 30px;display:grid;place-items:center;border-radius:9px;color:#ffb36f;background:rgba(243,137,54,.14);font-size:17px}
+.footer-socials a span:last-child{display:flex;flex-direction:column;gap:2px;min-width:0}
+.footer-socials small{font-size:8px;letter-spacing:1px;color:#8fa8ba;font-weight:800}
+.footer-socials b{font-size:10px;white-space:nowrap}
+.footer-side-note{display:flex;flex-direction:column;align-items:center;gap:7px;color:#dce7ef;text-align:center}
+.footer-side-ball{font-size:43px;filter:drop-shadow(0 0 13px rgba(255,175,102,.28));animation:footerFloat 4s ease-in-out infinite}
+.footer-side-note strong{font-size:10px;letter-spacing:1.7px;color:#ffb16d}
+.footer-side-note small{font-size:10px;color:#9fb2c0}
+.footer-bottom{display:flex;justify-content:space-between;gap:12px;padding-top:15px;border-top:1px solid rgba(202,221,235,.13);color:#8fa4b4;font-size:10px}
+.footer-credit{letter-spacing:1px;font-size:9px}.footer-credit i{font-style:normal;color:#f18b42}
+@keyframes footerPulse{0%,100%{opacity:1;box-shadow:0 0 5px #f59a4b}50%{opacity:.55;box-shadow:0 0 15px #f59a4b}}
+@keyframes footerFloat{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-7px) rotate(5deg)}}
+@keyframes footerShimmer{0%{background-position:0 0}100%{background-position:200% 0}}
+@media(max-width:800px){.footer-main{grid-template-columns:1fr 1.5fr;gap:22px}.footer-side-note{display:none}.footer-brand{justify-content:center}}
+@media(max-width:600px){.site-footer{padding:24px 14px 15px}.footer-topline{flex-direction:column;gap:7px}.footer-main{grid-template-columns:1fr;gap:22px;padding:23px 0}.footer-brand{justify-content:center}.footer-person h3{font-size:23px}.footer-socials{gap:7px}.footer-socials a{min-width:0;flex:1 1 145px;justify-content:center}.footer-bottom{flex-direction:column;align-items:center;text-align:center;gap:7px}.footer-pitch-lines{height:180px}}
+@media(prefers-reduced-motion:reduce){.site-footer:after,.footer-kicker-dot,.footer-side-ball{animation:none}.footer-emblem,.footer-socials a{transition:none}}
 </style>
-
 <script>
 const SUPABASE_URL="https://exruesqxsnrrjssrzqin.supabase.co";
 const SUPABASE_KEY="sb_publishable_pMEubiQyZ9lLH8FWvT-U4A_QrG4pA0m";
@@ -189,7 +225,7 @@ const {data:{session}}=await sb.auth.getSession();
 if(!session){el("login").classList.remove("hidden");el("panel").classList.add("hidden");return}
 const {data}=await sb.from("admin_users").select("user_id").eq("user_id",session.user.id).maybeSingle();
 if(!data){await sb.auth.signOut();msg("این حساب دسترسی مدیر ندارد.",true);return}
-el("login").classList.add("hidden");el("panel").classList.remove("hidden");loadAdmin();loadTeamSessions()
+el("login").classList.add("hidden");el("panel").classList.remove("hidden");loadAdmin()
 }
 el("login-form").onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);const {error}=await sb.auth.signInWithPassword({email:f.get("email"),password:f.get("password")});if(error){msg("ورود ناموفق بود؛ ایمیل یا رمز عبور را بررسی کنید.",true);return}checkAdmin()};
 el("logout").onclick=async()=>{await sb.auth.signOut();checkAdmin()};
@@ -272,111 +308,6 @@ el("admin-sessions").querySelectorAll("[data-delete-player]").forEach(b=>b.oncli
 el("admin-sessions").querySelectorAll("[data-open]").forEach(b=>b.onclick=async()=>{const {error}=await sb.from("sessions").update({is_open:b.dataset.val!=="true"}).eq("id",b.dataset.open);if(error)msg(error.message,true);loadAdmin();loadSessions()});
 el("admin-sessions").querySelectorAll("[data-delete-session]").forEach(b=>b.onclick=async()=>{const title=b.dataset.title||"این سانس";if(!confirm('حذف «'+title+'»؟ تمام ثبت‌نام‌ها و اطلاعات پرداخت این سانس برای همیشه حذف می‌شوند.'))return;b.disabled=true;const {error:regError}=await sb.from("registrations").delete().eq("session_id",b.dataset.deleteSession);if(regError){msg("حذف ثبت‌نام‌ها ناموفق بود: "+regError.message,true);b.disabled=false;return}const {error}=await sb.from("sessions").delete().eq("id",b.dataset.deleteSession).eq("is_open",false);if(error){msg("ثبت‌نام‌ها حذف شدند اما حذف سانس ناموفق بود: "+error.message,true);b.disabled=false;loadAdmin();return}msg("سانس و تمام ثبت‌نام‌های آن حذف شدند.");loadAdmin();loadSessions()});
 }
-
-// Team composition is managed in the admin page; assignments are currently kept in page memory.
-let teamPlayers=[];
-let teamA=[];
-let teamB=[];
-let teamSessionId="";
-let customPlayerPositions={};
-async function loadTeamSessions(){
-  const select=el("team-session-select");
-  const {data,error}=await sb.from("sessions").select("id,title,session_date,start_time").order("session_date",{ascending:false});
-  if(error){select.innerHTML='<option value="">خطا در دریافت سانس‌ها</option>';el("team-message").textContent=error.message;return}
-  select.innerHTML='<option value="">انتخاب سانس</option>'+(data||[]).map(s=>'<option value="'+esc(s.id)+'">'+esc(s.title)+' - '+dateFa(s.session_date)+' '+esc(String(s.start_time).slice(0,5))+'</option>').join("");
-}
-const formationPositions={
-  "2-2":[[28,25],[72,25],[28,59],[72,59]],
-  "1-2-1":[[50,20],[27,46],[73,46],[50,68]],
-  "3-1":[[50,20],[20,49],[50,53],[80,49]]
-};
-function renderTeamCard(name,players,teamKey){
-  const positions=formationPositions[el("team-formation").value]||formationPositions["2-2"];
-  const starters=players.slice(0,5);
-  const keeper=starters[0];
-  const fieldPlayers=starters.slice(1);
-  let markers="";
-  const playerMarker=(player,defaultPos,extraClass="")=>{
-    const custom=customPlayerPositions[String(player.id)];
-    const pos=custom||defaultPos;
-    return '<button type="button" class="pitch-player '+extraClass+'" style="left:'+pos[0]+'%;top:'+pos[1]+'%" data-team-move="'+teamKey+'" data-player-id="'+esc(player.id)+'" title="برای جابجایی، بازیکن را بکش؛ برای انتقال لمس کن"><span class="player-shirt" aria-label="لباس بازیکن"></span><span class="player-name-tag">'+esc(player.player_name)+'</span></button>';
-  };
-  if(keeper) markers+=playerMarker(keeper,[50,88],"goalkeeper");
-  fieldPlayers.forEach((player,index)=>{const pos=positions[index]||positions[positions.length-1];markers+=playerMarker(player,pos)});
-  const bench=players.slice(5);
-  const benchHtml=bench.length?'<div class="bench-area"><div class="bench-title">ذخیره‌ها · '+bench.length.toLocaleString("fa-IR")+' نفر</div>'+bench.map(player=>'<div class="bench-player"><span>🪑 '+esc(player.player_name)+'</span><button type="button" class="alt" data-team-move="'+teamKey+'" data-player-id="'+esc(player.id)+'">انتقال</button></div>').join('')+'</div>':"";
-  return '<div class="team-box '+(teamKey==="b"?"team-b":"team-a")+'"><h3><span class="team-heading"><i class="team-color-dot"></i>'+name+'</span><span class="team-count">'+players.length.toLocaleString("fa-IR")+' بازیکن</span></h3>'+
-    '<div class="pitch-board" data-pitch="'+teamKey+'"><div class="pitch-boundary"></div><div class="pitch-box-top"></div><div class="pitch-box-bottom"></div><div class="pitch-goal-top"></div><div class="pitch-goal-bottom"></div>'+markers+'</div>'+
-    '<div class="pitch-hint">برای تغییر موقعیت، بازیکن را روی زمین بکش؛ برای انتقال به تیم مقابل، یک‌بار لمس کن</div>'+benchHtml+
-    (players.length===0?'<div class="team-empty">بازیکنی در این تیم نیست.</div>':"")+'</div>';
-}
-function renderTeams(){
-  const box=el("teams-output");
-  box.innerHTML=renderTeamCard("تیم نارنجی",teamA,"a")+renderTeamCard("تیم آبی",teamB,"b");
-  box.querySelectorAll("[data-team-move]").forEach(button=>{
-    if(!button.classList.contains("pitch-player")){
-      button.onclick=()=>movePlayerToOtherTeam(button.dataset.teamMove,button.dataset.playerId);
-      return;
-    }
-    let start=null,moved=false;
-    button.addEventListener("pointerdown",e=>{start={x:e.clientX,y:e.clientY};moved=false;button.setPointerCapture(e.pointerId);button.classList.add("dragging");e.preventDefault()});
-    button.addEventListener("pointermove",e=>{
-      if(!start)return;
-      const dx=e.clientX-start.x,dy=e.clientY-start.y;
-      if(Math.hypot(dx,dy)>5)moved=true;
-      if(!moved)return;
-      const pitch=button.closest(".pitch-board"),r=pitch.getBoundingClientRect();
-      const x=Math.max(8,Math.min(92,(e.clientX-r.left)/r.width*100));
-      const y=Math.max(7,Math.min(93,(e.clientY-r.top)/r.height*100));
-      button.style.left=x+"%";button.style.top=y+"%";
-      customPlayerPositions[String(button.dataset.playerId)]=[x,y];
-    });
-    const finish=e=>{
-      if(!start)return;
-      button.classList.remove("dragging");
-      if(!moved)movePlayerToOtherTeam(button.dataset.teamMove,button.dataset.playerId);
-      start=null;
-    };
-    button.addEventListener("pointerup",finish);
-    button.addEventListener("pointercancel",()=>{start=null;button.classList.remove("dragging")});
-  });
-}
-function movePlayerToOtherTeam(teamKey,playerId){
-  const source=teamKey==="a"?teamA:teamB;
-  const target=teamKey==="a"?teamB:teamA;
-  const index=source.findIndex(p=>String(p.id)===String(playerId));
-  if(index<0)return;
-  target.push(source.splice(index,1)[0]);
-  renderTeams();
-}
-function randomizeTeams(){
-  const shuffled=[...teamPlayers];
-  for(let i=shuffled.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]]}
-  teamA=shuffled.filter((_,i)=>i%2===0);
-  teamB=shuffled.filter((_,i)=>i%2===1);
-  customPlayerPositions={};
-  renderTeams();
-  el("team-message").textContent="بازیکنان به‌صورت تصادفی و با اختلاف حداکثر یک نفر تقسیم شدند.";
-}
-async function fetchTeamPlayers(){
-  teamSessionId=el("team-session-select").value;
-  if(!teamSessionId){el("team-message").textContent="لطفاً ابتدا یک سانس انتخاب کن.";el("teams-output").innerHTML="";return}
-  el("team-message").textContent="در حال دریافت بازیکنان…";
-  el("teams-output").innerHTML="";
-  const {data,error}=await sb.from("registrations").select("id,player_name,phone").eq("session_id",teamSessionId).order("created_at");
-  if(error){el("team-message").textContent="خطا در دریافت بازیکنان: "+error.message;return}
-  teamPlayers=data||[];
-  teamA=[];teamB=[];customPlayerPositions={};
-  if(!teamPlayers.length){el("team-message").textContent="برای این سانس هنوز بازیکنی ثبت‌نام نکرده است.";return}
-  el("team-message").textContent=teamPlayers.length.toLocaleString("fa-IR")+" بازیکن پیدا شد. برای تقسیم‌بندی، روی «تقسیم تصادفی» بزن.";
-  randomizeTeams();
-}
-el("load-team-players").onclick=fetchTeamPlayers;
-el("team-formation").onchange=()=>{if(teamPlayers.length)renderTeams()};
-el("shuffle-teams").onclick=()=>{
-  if(!teamPlayers.length){el("team-message").textContent="ابتدا بازیکنان یک سانس را نمایش بده.";return}
-  randomizeTeams();
-};
 
 sb.auth.onAuthStateChange(()=>{if(!el("admin").classList.contains("hidden"))setTimeout(checkAdmin,0)});
 loadSessions();
