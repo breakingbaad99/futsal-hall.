@@ -54,7 +54,7 @@ table{width:100%;border-collapse:collapse;margin-top:12px;min-width:620px}td,th{
 .session-details span{display:inline-flex;align-items:center;gap:6px}
 .session-bottom{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;position:relative;z-index:1}
 .session-price{font-weight:800;color:#fff;font-size:15px}
-.book-btn{min-width:150px}
+.book-btn{min-width:150px}.book-btn:disabled{opacity:.68;cursor:not-allowed;transform:none;filter:none;box-shadow:none}
 .admin-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:4px 0 18px}
 .admin-stat{background:linear-gradient(140deg,#173b62,#0b203a);border:1px solid #345678;border-radius:15px;padding:15px;text-align:center}
 .admin-stat strong{display:block;font-size:23px;color:#ff9a43;line-height:1.4}
@@ -188,6 +188,7 @@ img,svg,video,canvas{max-width:100%;height:auto}
 <div class="field">عنوان<input name="title" required></div><div class="field">تاریخ سانس (شمسی)<input id="session-date-jalali" type="text" placeholder="مثلاً ۱۴۰۵/۰۸/۱۶" autocomplete="off" required><input id="session-date-gregorian" name="session_date" type="hidden" required></div>
 <div class="field">ساعت<input name="start_time" type="time" required></div><div class="field">مدت<input name="duration" value="۹۰ دقیقه" required></div>
 <div class="field">هزینه (تومان)<input name="fee" type="number" min="0" value="0" required></div>
+<div class="field">ظرفیت بازیکنان<input name="capacity" type="number" min="1" step="1" value="12" required><small class="muted">حداکثر تعداد بازیکنان این سانس</small></div>
 </div><button>ثبت سانس</button></form></div>
 <div class="card"><h2>مدیریت ثبت‌نام‌ها و پرداخت</h2><div id="admin-sessions"></div></div>
 
@@ -293,15 +294,45 @@ function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&l
 function dateFa(d){return new Date(d+"T12:00:00").toLocaleDateString("fa-IR")}
 function toman(n){return Number(n||0).toLocaleString("fa-IR")+" تومان"}
 async function loadSessions(){
-const {data,error}=await sb.from("sessions").select("id,title,session_date,start_time,duration,fee").eq("is_open",true).order("session_date").order("start_time");
-if(error){el("sessions").textContent="خطا در دریافت سانس‌ها: "+error.message;return}
-rows=data||[];
-el("sessions").innerHTML=rows.length?rows.map(s=>'<div class="session public-session"><div class="session-top"><span class="session-title">'+esc(s.title)+'</span><span class="session-tag">● ثبت‌نام باز است</span></div><div class="session-details"><span>📅 '+dateFa(s.session_date)+'</span><span>🕒 '+esc(String(s.start_time).slice(0,5))+'</span><span>⏱ '+esc(s.duration||"۹۰ دقیقه")+'</span></div><div class="session-bottom"><span class="session-price">هزینه: '+toman(s.fee)+'</span><button class="book-btn" type="button" data-book="'+s.id+'">ثبت‌نام در این سانس ←</button></div></div>').join(""):"هنوز سانس فعالی وجود ندارد.";
-el("sessions").querySelectorAll("[data-book]").forEach(b=>b.onclick=()=>{el("session-select").value=b.dataset.book;el("reg").scrollIntoView({behavior:"smooth",block:"center"});el("reg").querySelector('[name="player_name"]').focus()});
-el("session-select").innerHTML='<option value="">انتخاب سانس</option>'+rows.map(s=>'<option value="'+s.id+'">'+esc(s.title)+" - "+dateFa(s.session_date)+" "+esc(String(s.start_time).slice(0,5))+'</option>').join("");
+  const {data:statusRows,error:statusError}=await sb.from("session_capacity_status")
+    .select("session_id,capacity,registered_count,remaining_capacity,is_full");
+  if(statusError){el("sessions").textContent="خطا در دریافت ظرفیت سانس‌ها: "+statusError.message;return}
+  const statusById=new Map((statusRows||[]).map(x=>[x.session_id,x]));
+  const fullIds=(statusRows||[]).filter(x=>x.is_full).map(x=>x.session_id);
+  let query=sb.from("sessions").select("id,title,session_date,start_time,duration,fee,capacity,is_open,is_manually_closed")
+    .order("session_date").order("start_time");
+  if(fullIds.length) query=query.or("is_open.eq.true,id.in.("+fullIds.join(",")+")");
+  else query=query.eq("is_open",true);
+  const {data,error}=await query;
+  if(error){el("sessions").textContent="خطا در دریافت سانس‌ها: "+error.message;return}
+  rows=data||[];
+  el("sessions").innerHTML=rows.length?rows.map(s=>{
+    const st=statusById.get(s.id)||{capacity:s.capacity,registered_count:0,remaining_capacity:s.capacity,is_full:false};
+    const full=!!st.is_full;
+    return '<div class="session public-session"><div class="session-top"><span class="session-title">'+esc(s.title)+'</span><span class="session-tag">'+(full?'● ظرفیت تکمیل شد':'● ثبت‌نام باز است')+'</span></div><div class="session-details"><span>📅 '+dateFa(s.session_date)+'</span><span>🕒 '+esc(String(s.start_time).slice(0,5))+'</span><span>⏱ '+esc(s.duration||"۹۰ دقیقه")+'</span><span>👥 '+Number(st.registered_count).toLocaleString("fa-IR")+' از '+Number(st.capacity).toLocaleString("fa-IR")+' نفر</span><span>🪑 '+(full?'ظرفیت تکمیل':Number(st.remaining_capacity).toLocaleString("fa-IR")+' جای خالی')+'</span></div><div class="session-bottom"><span class="session-price">هزینه: '+toman(s.fee)+'</span><button class="book-btn" type="button" data-book="'+s.id+'" '+(full?'disabled aria-disabled="true"':'')+'>'+(full?'ظرفیت تکمیل شد':'ثبت‌نام در این سانس ←')+'</button></div></div>';
+  }).join(""):"هنوز سانس فعالی وجود ندارد.";
+  el("sessions").querySelectorAll("[data-book]:not(:disabled)").forEach(b=>b.onclick=()=>{el("session-select").value=b.dataset.book;el("reg").scrollIntoView({behavior:"smooth",block:"center"});el("reg").querySelector('[name="player_name"]').focus()});
+  const availableRows=rows.filter(s=>s.is_open && !(statusById.get(s.id)||{}).is_full);
+  el("session-select").innerHTML='<option value="">انتخاب سانس</option>'+availableRows.map(s=>'<option value="'+s.id+'">'+esc(s.title)+" - "+dateFa(s.session_date)+" "+esc(String(s.start_time).slice(0,5))+'</option>').join("");
 }
 el("refresh").onclick=loadSessions;
-el("reg").onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);const {error}=await sb.from("registrations").insert({session_id:f.get("session_id"),player_name:f.get("player_name").trim(),phone:f.get("phone").trim()});if(error){msg("ثبت‌نام ناموفق: "+error.message,true);return}msg("ثبت‌نام با موفقیت انجام شد. پرداخت پس از بررسی مدیر تأیید می‌شود.");e.target.reset();loadSessions()};
+el("reg").onsubmit=async e=>{
+  e.preventDefault();
+  const submitButton=e.target.querySelector('button[type="submit"],button:not([type])');
+  if(submitButton)submitButton.disabled=true;
+  const f=new FormData(e.target);
+  const {error}=await sb.from("registrations").insert({session_id:f.get("session_id"),player_name:f.get("player_name").trim(),phone:f.get("phone").trim()});
+  if(submitButton)submitButton.disabled=false;
+  if(error){
+    const reason=String(error.message||"");
+    if(reason.includes("CAPACITY_FULL"))msg("ظرفیت این سانس تکمیل شده است؛ لطفاً سانس دیگری انتخاب کنید.",true);
+    else if(reason.includes("SESSION_CLOSED"))msg("ثبت‌نام این سانس بسته شده است.",true);
+    else msg("ثبت‌نام ناموفق: "+reason,true);
+    await loadSessions();return;
+  }
+  msg("ثبت‌نام با موفقیت انجام شد. پرداخت پس از بررسی مدیر تأیید می‌شود.");
+  e.target.reset();await loadSessions();
+};
 function tab(a){el("player").classList.toggle("hidden",a);el("admin").classList.toggle("hidden",!a);if(a)checkAdmin()}
 function goToSection(target){target.scrollIntoView({behavior:"smooth",block:"start"})}
 el("player-tab").onclick=()=>{tab(false);setTimeout(()=>goToSection(el("sessions-card")),40)};
@@ -353,7 +384,9 @@ el("new-session").onsubmit=async e=>{
     start_time:f.get("start_time"),
     duration:f.get("duration"),
     fee:Number(f.get("fee")),
-    is_open:true
+    capacity:Number(f.get("capacity")),
+    is_open:true,
+    is_manually_closed:false
   });
   if(error){msg("خطا: "+error.message,true);return}
   msg("سانس ایجاد شد.");
@@ -372,7 +405,7 @@ const list=r||[];totalPlayers+=list.length;paidPlayers+=list.filter(x=>x.paid).l
 }
 out='<div class="admin-summary"><div class="admin-stat"><strong>'+((sessions||[]).length).toLocaleString("fa-IR")+'</strong><span>کل سانس‌ها</span></div><div class="admin-stat"><strong>'+totalPlayers.toLocaleString("fa-IR")+'</strong><span>کل ثبت‌نام‌ها</span></div><div class="admin-stat"><strong>'+paidPlayers.toLocaleString("fa-IR")+'</strong><span>پرداخت‌های تأییدشده</span></div></div><div class="admin-stat" style="margin-bottom:16px;text-align:right"><span>مجموع مبالغ تأییدشده</span><strong style="font-size:19px">'+toman(paidTotal)+'</strong></div>';
 for(const item of all){const s=item.s,r=item.r,re=item.re;
-out+='<div class="session admin-session '+(s.is_open?'':'closed')+'"><div class="row"><b class="session-title">'+esc(s.title)+'</b><span class="admin-status '+(s.is_open?'':'closed')+'">'+(s.is_open?'● ثبت‌نام باز':'● ثبت‌نام بسته')+'</span></div><div class="session-details"><span>📅 '+dateFa(s.session_date)+'</span><span>🕒 '+esc(String(s.start_time).slice(0,5))+'</span><span>👥 '+r.length.toLocaleString("fa-IR")+' بازیکن</span><span>💳 '+toman(s.fee)+'</span></div><div class="actions"><button class="alt" data-open="'+s.id+'" data-val="'+s.is_open+'">'+(s.is_open?'بستن ثبت‌نام':'بازکردن ثبت‌نام')+'</button>'+(s.is_open?'':'<button class="danger" data-delete-session="'+s.id+'" data-title="'+esc(s.title)+'">حذف سانس</button>')+'</div>';
+out+='<div class="session admin-session '+(s.is_open?'':'closed')+'"><div class="row"><b class="session-title">'+esc(s.title)+'</b><span class="admin-status '+(s.is_open?'':'closed')+'">'+(s.is_open?'● ثبت‌نام باز':'● ثبت‌نام بسته')+'</span></div><div class="session-details"><span>📅 '+dateFa(s.session_date)+'</span><span>🕒 '+esc(String(s.start_time).slice(0,5))+'</span><span>👥 '+r.length.toLocaleString("fa-IR")+' از '+Number(s.capacity||12).toLocaleString("fa-IR")+' نفر</span><span>💳 '+toman(s.fee)+'</span></div><div class="actions">'+((s.is_open||s.is_manually_closed)?'<button class="alt" data-open="'+s.id+'" data-val="'+s.is_open+'">'+(s.is_open?'بستن ثبت‌نام':'بازکردن ثبت‌نام')+'</button>':'')+(s.is_open?'':'<button class="danger" data-delete-session="'+s.id+'" data-title="'+esc(s.title)+'">حذف سانس</button>')+'</div><div class="grid"><div class="field">ظرفیت فعلی ویرایش ظرفیت<input type="number" min="'+r.length+'" step="1" value="'+Number(s.capacity||12)+'" data-capacity-input="'+s.id+'"><small class="muted">حداقل ظرفیت مجاز: '+r.length.toLocaleString("fa-IR")+' نفر ثبت‌نام‌شده</small></div><div class="field" style="align-self:end"><button type="button" data-save-capacity="'+s.id+'">ذخیره ظرفیت جدید</button></div></div>';
 if(re)out+='<p class="red">'+esc(re.message)+'</p>';
 else if(r.length)out+='<h3>فهرست بازیکنان · '+r.length.toLocaleString("fa-IR")+' نفر</h3><div class="tablewrap"><table><tr><th>نام</th><th>تماس</th><th>مبلغ</th><th>پرداخت</th><th>عملیات</th></tr>'+r.map(x=>'<tr><td>'+esc(x.player_name)+'</td><td>'+esc(x.phone)+'</td><td>'+toman(x.amount)+'</td><td class="'+(x.paid?'pill':'red')+'">'+(x.paid?'پرداخت‌شده':'پرداخت‌نشده')+'</td><td><button data-paid="'+x.id+'" data-val="'+x.paid+'">'+(x.paid?'لغو تأیید':'تأیید پرداخت')+'</button> <button class="danger" data-delete-player="'+x.id+'" data-player="'+esc(x.player_name)+'" data-session="'+esc(s.title)+'">حذف بازیکن</button></td></tr>').join('')+'</table></div>';
 else out+='<p class="muted">هنوز بازیکنی برای این سانس ثبت‌نام نکرده است.</p>';
@@ -393,10 +426,33 @@ el("admin-sessions").querySelectorAll("[data-delete-player]").forEach(b=>b.oncli
  await loadSessions();
 });
 
-el("admin-sessions").querySelectorAll("[data-open]").forEach(b=>b.onclick=async()=>{const {error}=await sb.from("sessions").update({is_open:b.dataset.val!=="true"}).eq("id",b.dataset.open);if(error)msg(error.message,true);loadAdmin();loadSessions()});
+el("admin-sessions").querySelectorAll("[data-open]").forEach(b=>b.onclick=async()=>{
+  const closing=b.dataset.val==="true";
+  const {error}=await sb.from("sessions").update({is_manually_closed:closing}).eq("id",b.dataset.open);
+  if(error)msg(error.message,true);
+  else msg(closing?"ثبت‌نام این سانس به‌صورت دستی بسته شد.":"درخواست بازگشایی ثبت شد؛ اگر ظرفیت خالی باشد ثبت‌نام فعال می‌شود.");
+  await loadAdmin();await loadSessions();
+});
+el("admin-sessions").querySelectorAll("[data-save-capacity]").forEach(b=>b.onclick=async()=>{
+  const id=b.dataset.saveCapacity;
+  const input=el("admin-sessions").querySelector('[data-capacity-input="'+id+'"]');
+  const value=Number(input?.value);
+  if(!Number.isInteger(value)||value<1){msg("ظرفیت باید یک عدد صحیح و حداقل ۱ باشد.",true);return}
+  b.disabled=true;
+  const {error}=await sb.from("sessions").update({capacity:value}).eq("id",id).select("id");
+  b.disabled=false;
+  if(error){
+    if(String(error.message||"").includes("CAPACITY_BELOW_REGISTERED"))msg("ظرفیت جدید نمی‌تواند کمتر از تعداد بازیکنان ثبت‌نام‌شده باشد.",true);
+    else msg("ذخیره ظرفیت ناموفق بود: "+error.message,true);
+    await loadAdmin();return;
+  }
+  msg("ظرفیت با موفقیت به‌روزرسانی شد.");
+  await loadAdmin();await loadSessions();
+});
 el("admin-sessions").querySelectorAll("[data-delete-session]").forEach(b=>b.onclick=async()=>{const title=b.dataset.title||"این سانس";if(!confirm('حذف «'+title+'»؟ تمام ثبت‌نام‌ها و اطلاعات پرداخت این سانس برای همیشه حذف می‌شوند.'))return;b.disabled=true;const {error:regError}=await sb.from("registrations").delete().eq("session_id",b.dataset.deleteSession);if(regError){msg("حذف ثبت‌نام‌ها ناموفق بود: "+regError.message,true);b.disabled=false;return}const {error}=await sb.from("sessions").delete().eq("id",b.dataset.deleteSession).eq("is_open",false);if(error){msg("ثبت‌نام‌ها حذف شدند اما حذف سانس ناموفق بود: "+error.message,true);b.disabled=false;loadAdmin();return}msg("سانس و تمام ثبت‌نام‌های آن حذف شدند.");loadAdmin();loadSessions()});
 }
 
 sb.auth.onAuthStateChange(()=>{if(!el("admin").classList.contains("hidden"))setTimeout(checkAdmin,0)});
 loadSessions();
+setInterval(loadSessions,10000);
 </script></body></html>
