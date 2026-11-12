@@ -41,6 +41,10 @@ input:focus,select:focus{border-color:var(--orange2);box-shadow:0 0 0 3px rgba(2
 table{width:100%;border-collapse:collapse;margin-top:12px;min-width:620px}td,th{text-align:right;padding:11px;border-bottom:1px solid #294563;font-size:13px}th{color:#fff;background:#173657}td{color:#e7eef7}.tablewrap{overflow:auto;border-radius:12px}
 .pill{color:#ff9a43;font-weight:700}.red{color:#ff8989}
 #notice:not(.hidden){display:block}
+.registration-notice{margin:14px 0 4px;padding:14px 16px;border-radius:13px;border:1px solid #2e9b68;background:linear-gradient(135deg,#123e32,#0c302a);color:#c9ffe2;font-weight:800;text-align:center;box-shadow:0 7px 20px rgba(0,0,0,.18);line-height:1.9}
+.registration-notice.error{border-color:#a84450;background:linear-gradient(135deg,#4a2029,#351923);color:#ffd8dc}
+.registration-notice:not(.hidden){display:block;animation:regNoticeIn .28s ease-out}
+@keyframes regNoticeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
 
 /* Enhanced session cards and admin dashboard */
 .session{position:relative;overflow:hidden;transition:transform .22s,border-color .22s,box-shadow .22s}
@@ -176,7 +180,7 @@ img,svg,video,canvas{max-width:100%;height:auto}
 <div class="field">نام و نام خانوادگی<input name="player_name" required maxlength="100"></div>
 <div class="field">شماره تماس<input name="phone" required maxlength="30"></div>
 <div class="field">انتخاب سانس<select id="session-select" name="session_id" required><option value="">انتخاب سانس</option></select></div>
-</div><button>ثبت‌نام</button><p class="muted">ثبت‌نام فوری است؛ تأیید پرداخت توسط مدیر انجام می‌شود.</p></form></div>
+</div><button type="submit">ثبت‌نام</button><div id="reg-notice" class="hidden registration-notice" role="status" aria-live="polite"></div><p class="muted">ثبت‌نام فوری است؛ تأیید پرداخت توسط مدیر انجام می‌شود.</p></form></div>
 </section>
 <section id="admin" class="hidden">
 <div class="card" id="login"><h2>ورود مدیر</h2><form id="login-form"><div class="grid">
@@ -316,22 +320,29 @@ async function loadSessions(){
   el("session-select").innerHTML='<option value="">انتخاب سانس</option>'+availableRows.map(s=>'<option value="'+s.id+'">'+esc(s.title)+" - "+dateFa(s.session_date)+" "+esc(String(s.start_time).slice(0,5))+'</option>').join("");
 }
 el("refresh").onclick=loadSessions;
+function regMsg(message,bad=false){
+  const box=el("reg-notice");
+  box.textContent=message;
+  box.className="registration-notice"+(bad?" error":"");
+}
 el("reg").onsubmit=async e=>{
   e.preventDefault();
   const submitButton=e.target.querySelector('button[type="submit"],button:not([type])');
   if(submitButton)submitButton.disabled=true;
+  el("reg-notice").className="hidden registration-notice";
   const f=new FormData(e.target);
   const {error}=await sb.from("registrations").insert({session_id:f.get("session_id"),player_name:f.get("player_name").trim(),phone:f.get("phone").trim()});
   if(submitButton)submitButton.disabled=false;
   if(error){
     const reason=String(error.message||"");
-    if(reason.includes("CAPACITY_FULL"))msg("ظرفیت این سانس تکمیل شده است؛ لطفاً سانس دیگری انتخاب کنید.",true);
-    else if(reason.includes("SESSION_CLOSED"))msg("ثبت‌نام این سانس بسته شده است.",true);
-    else msg("ثبت‌نام ناموفق: "+reason,true);
+    if(reason.includes("CAPACITY_FULL"))regMsg("ظرفیت این سانس تکمیل شده است؛ لطفاً سانس دیگری انتخاب کنید.",true);
+    else if(reason.includes("SESSION_CLOSED"))regMsg("ثبت‌نام این سانس بسته شده است.",true);
+    else regMsg("ثبت‌نام ناموفق: "+reason,true);
     await loadSessions();return;
   }
-  msg("ثبت‌نام با موفقیت انجام شد. پرداخت پس از بررسی مدیر تأیید می‌شود.");
-  e.target.reset();await loadSessions();
+  e.target.reset();
+  regMsg("✓ ثبت‌نام با موفقیت انجام شد. پرداخت پس از بررسی مدیر تأیید می‌شود.");
+  await loadSessions();
 };
 function tab(a){el("player").classList.toggle("hidden",a);el("admin").classList.toggle("hidden",!a);if(a)checkAdmin()}
 function goToSection(target){target.scrollIntoView({behavior:"smooth",block:"start"})}
