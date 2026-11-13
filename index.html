@@ -3,7 +3,16 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>KarimiSports | رزرو سانس</title>
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="theme-color" content="#07172d">
+<meta name="description" content="رزرو آنلاین سانس فوتسال KarimiSports">
+<meta name="application-name" content="KarimiSports">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="KarimiSports">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+
+  <link rel="icon" type="image/png" sizes="128x128" href="favicon.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css">
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
@@ -466,4 +475,14 @@ el("admin-sessions").querySelectorAll("[data-delete-session]").forEach(b=>b.oncl
 sb.auth.onAuthStateChange(()=>{if(!el("admin").classList.contains("hidden"))setTimeout(checkAdmin,0)});
 loadSessions();
 setInterval(loadSessions,10000);
-</script></body></html>
+</script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch((error) => {
+      console.warn("PWA service worker registration failed:", error);
+    });
+  });
+}
+</script>
+</body></html>
