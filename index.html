@@ -350,7 +350,7 @@ const playerPhoneError=el("player-phone-error");
 
 function validatePlayerName(showMessage=true){
   const value=playerNameInput.value;
-  const valid=/^[\\p{Script=Arabic}a-zA-Z\\s\\u200c]+$/u.test(value) && /[\\p{L}]/u.test(value);
+  const valid=/^[\p{Script=Arabic}a-zA-Z\s\u200c]+$/u.test(value) && /[\p{L}]/u.test(value);
   playerNameInput.classList.toggle("invalid-field",!valid && value.length>0);
   playerNameError.classList.toggle("hidden",valid || value.length===0 || !showMessage);
   playerNameInput.setAttribute("aria-invalid",String(!valid && value.length>0));
