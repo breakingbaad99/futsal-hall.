@@ -44,8 +44,23 @@ table{width:100%;border-collapse:collapse;margin-top:12px;min-width:620px}td,th{
 .registration-notice{margin:14px 0 4px;padding:14px 16px;border-radius:13px;border:1px solid #2e9b68;background:linear-gradient(135deg,#123e32,#0c302a);color:#c9ffe2;font-weight:800;text-align:center;box-shadow:0 7px 20px rgba(0,0,0,.18);line-height:1.9}
 .registration-notice.error{border-color:#a84450;background:linear-gradient(135deg,#4a2029,#351923);color:#ffd8dc}
 .registration-notice:not(.hidden){display:block;animation:regNoticeIn .28s ease-out}
-.validation-hint:not(.hidden){display:block;color:#ff9b9b;font-size:12px;font-weight:700}
-input.invalid-field{border-color:#d94b59!important;box-shadow:0 0 0 3px rgba(217,75,89,.16)!important}
+.validation-hint:not(.hidden){
+  display:flex;align-items:center;gap:9px;width:fit-content;max-width:100%;
+  box-sizing:border-box;margin:0 0 9px;padding:8px 12px;
+  border:1px solid rgba(255,105,115,.42);border-radius:11px;
+  background:linear-gradient(110deg,rgba(111,29,43,.42),rgba(74,29,40,.24));
+  color:#ffd5d9;font-size:12px;font-weight:750;line-height:1.7;
+  box-shadow:0 5px 16px rgba(0,0,0,.13);
+  animation:validationPop .24s cubic-bezier(.2,.8,.2,1) both
+}
+.validation-hint:not(.hidden)::before{
+  content:"!";display:inline-flex;flex:0 0 18px;width:18px;height:18px;
+  align-items:center;justify-content:center;border-radius:50%;
+  background:#e45b68;color:#fff;font-size:12px;font-weight:900;
+  box-shadow:0 0 0 3px rgba(228,91,104,.13)
+}
+input.invalid-field{border-color:#e45b68!important;box-shadow:0 0 0 3px rgba(217,75,89,.16)!important}
+@keyframes validationPop{from{opacity:0;transform:translateY(7px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
 @keyframes regNoticeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
 
 /* Enhanced session cards and admin dashboard */
@@ -179,8 +194,8 @@ img,svg,video,canvas{max-width:100%;height:auto}
 <section id="player">
 <div class="card" id="sessions-card"><h2>سانس‌های فعال</h2><div id="sessions">در حال دریافت…</div><button class="alt" id="refresh">به‌روزرسانی</button></div>
 <div class="card"><h2>ثبت‌نام بازیکن</h2><form id="reg"><div class="grid">
-<div class="field">نام و نام خانوادگی<input name="player_name" id="player-name" type="text" required maxlength="100" autocomplete="name" aria-describedby="player-name-error"><small id="player-name-error" class="muted validation-hint hidden" role="alert">فقط حروف فارسی و انگلیسی و فاصله مجاز است.</small></div>
-<div class="field">شماره تماس<input name="phone" id="player-phone" type="tel" required maxlength="30" inputmode="numeric" autocomplete="tel" aria-describedby="player-phone-error"><small id="player-phone-error" class="muted validation-hint hidden" role="alert">شماره تماس فقط باید شامل عدد باشد.</small></div>
+<div class="field">نام و نام خانوادگی<small id="player-name-error" class="muted validation-hint hidden" role="alert">فقط حروف فارسی و انگلیسی و فاصله مجاز است.</small><input name="player_name" id="player-name" type="text" required maxlength="100" autocomplete="name" aria-describedby="player-name-error"></div>
+<div class="field">شماره تماس<small id="player-phone-error" class="muted validation-hint hidden" role="alert">شماره تماس فقط باید شامل عدد باشد.</small><input name="phone" id="player-phone" type="tel" required maxlength="30" inputmode="numeric" autocomplete="tel" aria-describedby="player-phone-error"></div>
 <div class="field">انتخاب سانس<select id="session-select" name="session_id" required><option value="">انتخاب سانس</option></select></div>
 </div><button type="submit">ثبت‌نام</button><div id="reg-notice" class="hidden registration-notice" role="status" aria-live="polite"></div><p class="muted">ثبت‌نام فوری است؛ تأیید پرداخت توسط مدیر انجام می‌شود.</p></form></div>
 </section>
