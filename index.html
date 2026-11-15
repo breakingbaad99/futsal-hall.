@@ -3,16 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>KarimiSports | رزرو سانس</title>
-<meta name="theme-color" content="#07172d">
-<meta name="description" content="رزرو آنلاین سانس فوتسال KarimiSports">
-<meta name="application-name" content="KarimiSports">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="KarimiSports">
-<link rel="manifest" href="./manifest.webmanifest">
-<link rel="apple-touch-icon" href="./icons/icon-192.png">
-
-  <link rel="icon" type="image/png" sizes="128x128" href="favicon.png">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css">
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
@@ -53,6 +44,8 @@ table{width:100%;border-collapse:collapse;margin-top:12px;min-width:620px}td,th{
 .registration-notice{margin:14px 0 4px;padding:14px 16px;border-radius:13px;border:1px solid #2e9b68;background:linear-gradient(135deg,#123e32,#0c302a);color:#c9ffe2;font-weight:800;text-align:center;box-shadow:0 7px 20px rgba(0,0,0,.18);line-height:1.9}
 .registration-notice.error{border-color:#a84450;background:linear-gradient(135deg,#4a2029,#351923);color:#ffd8dc}
 .registration-notice:not(.hidden){display:block;animation:regNoticeIn .28s ease-out}
+.validation-hint:not(.hidden){display:block;color:#ff9b9b;font-size:12px;font-weight:700}
+input.invalid-field{border-color:#d94b59!important;box-shadow:0 0 0 3px rgba(217,75,89,.16)!important}
 @keyframes regNoticeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
 
 /* Enhanced session cards and admin dashboard */
@@ -186,8 +179,8 @@ img,svg,video,canvas{max-width:100%;height:auto}
 <section id="player">
 <div class="card" id="sessions-card"><h2>سانس‌های فعال</h2><div id="sessions">در حال دریافت…</div><button class="alt" id="refresh">به‌روزرسانی</button></div>
 <div class="card"><h2>ثبت‌نام بازیکن</h2><form id="reg"><div class="grid">
-<div class="field">نام و نام خانوادگی<input name="player_name" required maxlength="100"></div>
-<div class="field">شماره تماس<input name="phone" required maxlength="30"></div>
+<div class="field">نام و نام خانوادگی<input name="player_name" id="player-name" type="text" required maxlength="100" autocomplete="name" aria-describedby="player-name-error"><small id="player-name-error" class="muted validation-hint hidden" role="alert">فقط حروف فارسی و انگلیسی و فاصله مجاز است.</small></div>
+<div class="field">شماره تماس<input name="phone" id="player-phone" type="tel" required maxlength="30" inputmode="numeric" autocomplete="tel" aria-describedby="player-phone-error"><small id="player-phone-error" class="muted validation-hint hidden" role="alert">شماره تماس فقط باید شامل عدد باشد.</small></div>
 <div class="field">انتخاب سانس<select id="session-select" name="session_id" required><option value="">انتخاب سانس</option></select></div>
 </div><button type="submit">ثبت‌نام</button><div id="reg-notice" class="hidden registration-notice" role="status" aria-live="polite"></div><p class="muted">ثبت‌نام فوری است؛ تأیید پرداخت توسط مدیر انجام می‌شود.</p></form></div>
 </section>
@@ -334,13 +327,45 @@ function regMsg(message,bad=false){
   box.textContent=message;
   box.className="registration-notice"+(bad?" error":"");
 }
+// اعتبارسنجی ورودی‌های ثبت‌نام بازیکن
+const playerNameInput=el("player-name");
+const playerPhoneInput=el("player-phone");
+const playerNameError=el("player-name-error");
+const playerPhoneError=el("player-phone-error");
+
+function validatePlayerName(showMessage=true){
+  const value=playerNameInput.value;
+  const valid=/^[\\p{Script=Arabic}a-zA-Z\\s\\u200c]+$/u.test(value) && /[\\p{L}]/u.test(value);
+  playerNameInput.classList.toggle("invalid-field",!valid && value.length>0);
+  playerNameError.classList.toggle("hidden",valid || value.length===0 || !showMessage);
+  playerNameInput.setAttribute("aria-invalid",String(!valid && value.length>0));
+  return valid;
+}
+function validatePlayerPhone(showMessage=true){
+  const value=playerPhoneInput.value;
+  const valid=/^[0-9۰-۹٠-٩]+$/.test(value);
+  playerPhoneInput.classList.toggle("invalid-field",!valid && value.length>0);
+  playerPhoneError.classList.toggle("hidden",valid || value.length===0 || !showMessage);
+  playerPhoneInput.setAttribute("aria-invalid",String(!valid && value.length>0));
+  return valid;
+}
+playerNameInput.addEventListener("input",()=>validatePlayerName(true));
+playerPhoneInput.addEventListener("input",()=>validatePlayerPhone(true));
+
 el("reg").onsubmit=async e=>{
   e.preventDefault();
+  const nameValid=validatePlayerName(true);
+  const phoneValid=validatePlayerPhone(true);
+  if(!nameValid || !phoneValid){
+    regMsg("لطفاً خطاهای نام و شماره تماس را برطرف کنید.",true);
+    (!nameValid?playerNameInput:playerPhoneInput).focus();
+    return;
+  }
   const submitButton=e.target.querySelector('button[type="submit"],button:not([type])');
   if(submitButton)submitButton.disabled=true;
   el("reg-notice").className="hidden registration-notice";
   const f=new FormData(e.target);
-  const {error}=await sb.from("registrations").insert({session_id:f.get("session_id"),player_name:f.get("player_name").trim(),phone:f.get("phone").trim()});
+  const {error}=await sb.from("registrations").insert({session_id:f.get("session_id"),player_name:f.get("player_name").trim(),phone:toEnglishDigits(f.get("phone").trim())});
   if(submitButton)submitButton.disabled=false;
   if(error){
     const reason=String(error.message||"");
@@ -350,6 +375,8 @@ el("reg").onsubmit=async e=>{
     await loadSessions();return;
   }
   e.target.reset();
+  [playerNameInput,playerPhoneInput].forEach(input=>{input.classList.remove("invalid-field");input.setAttribute("aria-invalid","false")});
+  playerNameError.classList.add("hidden");playerPhoneError.classList.add("hidden");
   regMsg("✓ ثبت‌نام با موفقیت انجام شد. پرداخت پس از بررسی مدیر تأیید می‌شود.");
   await loadSessions();
 };
@@ -475,14 +502,4 @@ el("admin-sessions").querySelectorAll("[data-delete-session]").forEach(b=>b.oncl
 sb.auth.onAuthStateChange(()=>{if(!el("admin").classList.contains("hidden"))setTimeout(checkAdmin,0)});
 loadSessions();
 setInterval(loadSessions,10000);
-</script>
-<script>
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js").catch((error) => {
-      console.warn("PWA service worker registration failed:", error);
-    });
-  });
-}
-</script>
-</body></html>
+</script></body></html>
