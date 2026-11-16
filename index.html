@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>KarimiSports | رزرو سانس</title>
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%2229%22%20fill%3D%22%23fff%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Cpath%20d%3D%22m32%2017%2010%207-4%2012H26l-4-12z%22%20fill%3D%22%23111%22%2F%3E%3Cpath%20d%3D%22m32%203%200%2014m25%207-15%200m10%2024-14-12M32%2061V36M7%2048l15-12M7%2024l15%200M22%2024l-9-9m29%209%209-9m-25%2021-4%2015m16-15%204%2015%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E">
+<link rel="shortcut icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%2229%22%20fill%3D%22%23fff%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Cpath%20d%3D%22m32%2017%2010%207-4%2012H26l-4-12z%22%20fill%3D%22%23111%22%2F%3E%3Cpath%20d%3D%22m32%203%200%2014m25%207-15%200m10%2024-14-12M32%2061V36M7%2048l15-12M7%2024l15%200M22%2024l-9-9m29%209%209-9m-25%2021-4%2015m16-15%204%2015%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css">
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
@@ -68,6 +69,15 @@ input.invalid-field{border-color:#e45b68!important;box-shadow:0 0 0 3px rgba(217
 .session:hover{transform:translateY(-3px);border-color:#e87920;box-shadow:0 12px 26px rgba(0,0,0,.25)}
 .public-session{padding:19px 20px 17px;background:linear-gradient(125deg,rgba(22,57,94,.98),rgba(7,27,50,.98));border:1px solid #345b82;border-right:5px solid var(--orange2)}
 .public-session:after{content:"⚽";position:absolute;left:18px;bottom:-22px;font-size:92px;opacity:.055;pointer-events:none}
+.public-roster{position:relative;z-index:1;margin-top:15px;padding:13px 15px;border:1px solid rgba(139,174,207,.24);border-radius:13px;background:rgba(3,16,31,.38)}
+.public-roster-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px;color:#f4f7fb;font-size:13px;font-weight:800}
+.public-roster-count{color:#ffb16f;font-size:12px;white-space:nowrap}
+.public-roster-list{display:flex;flex-wrap:wrap;gap:7px}
+.public-player-name{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:20px;background:rgba(37,78,116,.68);border:1px solid rgba(126,169,207,.24);color:#eaf3fb;font-size:12px}
+.public-player-name:before{content:"";width:6px;height:6px;border-radius:50%;background:#ff9a43;flex:0 0 6px}
+.public-roster-empty,.public-roster-error{margin:0;color:#b7c6d8;font-size:12px}
+.public-roster-error{color:#ffc0c0}
+
 .session-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;position:relative;z-index:1}
 .session-title{font-size:18px;font-weight:800;color:#fff}
 .session-tag{display:inline-flex;align-items:center;gap:6px;background:rgba(255,121,13,.14);border:1px solid rgba(255,145,57,.38);color:#ffb16f;border-radius:30px;padding:4px 11px;font-size:12px;font-weight:700}
@@ -327,11 +337,37 @@ async function loadSessions(){
   const {data,error}=await query;
   if(error){el("sessions").textContent="خطا در دریافت سانس‌ها: "+error.message;return}
   rows=data||[];
+
+  // فقط نام بازیکنان برای نمایش عمومی دریافت می‌شود؛ شماره تماس و وضعیت پرداخت خوانده نمی‌شود.
+  let publicRegistrations=[];
+  let publicRosterError=null;
+  if(rows.length){
+    const {data:registrationsData,error:registrationsError}=await sb
+      .from("public_session_players")
+      .select("session_id,player_name")
+      .in("session_id",rows.map(s=>s.id));
+    if(registrationsError) publicRosterError=registrationsError;
+    else publicRegistrations=registrationsData||[];
+  }
+  const playersBySession=new Map();
+  publicRegistrations.forEach(r=>{
+    if(!playersBySession.has(r.session_id))playersBySession.set(r.session_id,[]);
+    playersBySession.get(r.session_id).push(r.player_name);
+  });
+
   el("sessions").innerHTML=rows.length?rows.map(s=>{
     const st=statusById.get(s.id)||{capacity:s.capacity,registered_count:0,remaining_capacity:s.capacity,is_full:false};
     const full=!!st.is_full;
-    return '<div class="session public-session"><div class="session-top"><span class="session-title">'+esc(s.title)+'</span><span class="session-tag">'+(full?'● ظرفیت تکمیل شد':'● ثبت‌نام باز است')+'</span></div><div class="session-details"><span>📅 '+dateFa(s.session_date)+'</span><span>🕒 '+esc(String(s.start_time).slice(0,5))+'</span><span>⏱ '+esc(s.duration||"۹۰ دقیقه")+'</span><span>👥 '+Number(st.registered_count).toLocaleString("fa-IR")+' از '+Number(st.capacity).toLocaleString("fa-IR")+' نفر</span><span>🪑 '+(full?'ظرفیت تکمیل':Number(st.remaining_capacity).toLocaleString("fa-IR")+' جای خالی')+'</span></div><div class="session-bottom"><span class="session-price">هزینه: '+toman(s.fee)+'</span><button class="book-btn" type="button" data-book="'+s.id+'" '+(full?'disabled aria-disabled="true"':'')+'>'+(full?'ظرفیت تکمیل شد':'ثبت‌نام در این سانس ←')+'</button></div></div>';
+    const names=playersBySession.get(s.id)||[];
+    const rosterHtml=publicRosterError
+      ? '<div class="public-roster"><p class="public-roster-error">نمایش اسامی در حال حاضر ممکن نیست.</p></div>'
+      : '<div class="public-roster"><div class="public-roster-head"><span>👥 بازیکنان ثبت‌نام‌شده</span><span class="public-roster-count">'+names.length.toLocaleString("fa-IR")+' نفر</span></div>'+
+        (names.length?'<div class="public-roster-list">'+names.map(name=>'<span class="public-player-name">'+esc(name)+'</span>').join("")+'</div>':'<p class="public-roster-empty">هنوز بازیکنی برای این سانس ثبت‌نام نکرده است.</p>')+'</div>';
+    return '<div class="session public-session"><div class="session-top"><span class="session-title">'+esc(s.title)+'</span><span class="session-tag">'+(full?'● ظرفیت تکمیل شد':'● ثبت‌نام باز است')+'</span></div><div class="session-details"><span>📅 '+dateFa(s.session_date)+'</span><span>🕒 '+esc(String(s.start_time).slice(0,5))+'</span><span>⏱ '+esc(s.duration||"۹۰ دقیقه")+'</span><span>👥 '+Number(st.registered_count).toLocaleString("fa-IR")+' از '+Number(st.capacity).toLocaleString("fa-IR")+' نفر</span><span>🪑 '+(full?'ظرفیت تکمیل':Number(st.remaining_capacity).toLocaleString("fa-IR")+' جای خالی')+'</span></div><div class="session-bottom"><span class="session-price">هزینه: '+toman(s.fee)+'</span><button class="book-btn" type="button" data-book="'+s.id+'" '+(full?'disabled aria-disabled="true"':'')+'>'+(full?'ظرفیت تکمیل شد':'ثبت‌نام در این سانس ←')+'</button></div>'+rosterHtml+'</div>';
   }).join(""):"هنوز سانس فعالی وجود ندارد.";
+  if(publicRosterError){
+    console.warn("Public player names could not be loaded. Check the public_session_players view and its SELECT grant in Supabase.",publicRosterError);
+  }
   el("sessions").querySelectorAll("[data-book]:not(:disabled)").forEach(b=>b.onclick=()=>{el("session-select").value=b.dataset.book;el("reg").scrollIntoView({behavior:"smooth",block:"center"});el("reg").querySelector('[name="player_name"]').focus()});
   const availableRows=rows.filter(s=>s.is_open && !(statusById.get(s.id)||{}).is_full);
   el("session-select").innerHTML='<option value="">انتخاب سانس</option>'+availableRows.map(s=>'<option value="'+s.id+'">'+esc(s.title)+" - "+dateFa(s.session_date)+" "+esc(String(s.start_time).slice(0,5))+'</option>').join("");
