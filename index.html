@@ -3,8 +3,11 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>KarimiSports | رزرو سانس</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%2229%22%20fill%3D%22%23fff%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Cpath%20d%3D%22m32%2017%2010%207-4%2012H26l-4-12z%22%20fill%3D%22%23111%22%2F%3E%3Cpath%20d%3D%22m32%203%200%2014m25%207-15%200m10%2024-14-12M32%2061V36M7%2048l15-12M7%2024l15%200M22%2024l-9-9m29%209%209-9m-25%2021-4%2015m16-15%204%2015%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E">
-<link rel="shortcut icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%2229%22%20fill%3D%22%23fff%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%2F%3E%3Cpath%20d%3D%22m32%2017%2010%207-4%2012H26l-4-12z%22%20fill%3D%22%23111%22%2F%3E%3Cpath%20d%3D%22m32%203%200%2014m25%207-15%200m10%2024-14-12M32%2061V36M7%2048l15-12M7%2024l15%200M22%2024l-9-9m29%209%209-9m-25%2021-4%2015m16-15%204%2015%22%20fill%3D%22none%22%20stroke%3D%22%23111%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+  <link rel="shortcut icon" type="image/png" href="./favicon.png">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <meta name="theme-color" content="#07172d">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css">
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
@@ -186,6 +189,11 @@ img,svg,video,canvas{max-width:100%;height:auto}
  .nav-links a:active,.nav-links .nav-login:active{border-color:#ff9b45;background:linear-gradient(155deg,#23486d,#102b49)}
 }
 
+
+.session-countdown{position:relative;z-index:1;display:flex;align-items:center;gap:8px;width:fit-content;max-width:100%;margin:0 0 13px;padding:8px 13px;border:1px solid rgba(255,157,74,.38);border-radius:11px;background:linear-gradient(110deg,rgba(91,48,18,.42),rgba(42,31,26,.3));color:#ffd2a6;font-size:13px;font-weight:800;line-height:1.8;box-shadow:inset 0 1px rgba(255,255,255,.04)}
+.session-countdown.started{border-color:rgba(67,190,132,.4);background:rgba(19,75,54,.38);color:#a9f0c9}
+@media(max-width:600px){.session-countdown{font-size:12px;padding:7px 10px}}
+
 </style></head>
 <body>
 <header id="top" class="site-header">
@@ -324,6 +332,40 @@ function msg(t,bad=false){el("notice").textContent=t;el("notice").className=bad?
 function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function dateFa(d){return new Date(d+"T12:00:00").toLocaleDateString("fa-IR")}
 function toman(n){return Number(n||0).toLocaleString("fa-IR")+" تومان"}
+function tehranDateTimeToTimestamp(date,time){
+  const dateParts=String(date||"").slice(0,10).split("-").map(Number);
+  const timeParts=String(time||"").slice(0,5).split(":").map(Number);
+  if(dateParts.length!==3||timeParts.length!==2||dateParts.some(n=>!Number.isFinite(n))||timeParts.some(n=>!Number.isFinite(n)))return NaN;
+  const [year,month,day]=dateParts,[hour,minute]=timeParts;
+  const targetUtc=Date.UTC(year,month-1,day,hour,minute);
+  let guess=targetUtc;
+  const formatter=new Intl.DateTimeFormat("en-GB",{timeZone:"Asia/Tehran",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"});
+  for(let i=0;i<4;i++){
+    const parts=Object.fromEntries(formatter.formatToParts(new Date(guess)).filter(part=>part.type!=="literal").map(part=>[part.type,Number(part.value)]));
+    const representedUtc=Date.UTC(parts.year,parts.month-1,parts.day,parts.hour,parts.minute);
+    const correction=targetUtc-representedUtc;
+    guess+=correction;
+    if(correction===0)break;
+  }
+  return guess;
+}
+function updateSessionCountdowns(){
+  const now=Date.now();
+  document.querySelectorAll(".session-countdown[data-start-at]").forEach(node=>{
+    const startAt=Number(node.dataset.startAt);
+    if(!Number.isFinite(startAt)){node.textContent="زمان شروع نامشخص است";return}
+    const remaining=startAt-now;
+    if(remaining<=0){node.textContent="🏁 زمان شروع بازی رسیده است";node.classList.add("started");return}
+    node.classList.remove("started");
+    const totalMinutes=Math.ceil(remaining/60000);
+    const days=Math.floor(totalMinutes/1440),hours=Math.floor((totalMinutes%1440)/60),minutes=totalMinutes%60;
+    const pieces=[];
+    if(days)pieces.push(days.toLocaleString("fa-IR")+" روز");
+    if(hours)pieces.push(hours.toLocaleString("fa-IR")+" ساعت");
+    if(minutes||!pieces.length)pieces.push(minutes.toLocaleString("fa-IR")+" دقیقه");
+    node.textContent="⏳ شروع بازی تا: "+pieces.join(" و ");
+  });
+}
 async function loadSessions(){
   const {data:statusRows,error:statusError}=await sb.from("session_capacity_status")
     .select("session_id,capacity,registered_count,remaining_capacity,is_full");
@@ -359,12 +401,15 @@ async function loadSessions(){
     const st=statusById.get(s.id)||{capacity:s.capacity,registered_count:0,remaining_capacity:s.capacity,is_full:false};
     const full=!!st.is_full;
     const names=playersBySession.get(s.id)||[];
+    const startAt=tehranDateTimeToTimestamp(s.session_date,s.start_time);
+    const countdownHtml='<div class="session-countdown" data-start-at="'+(Number.isFinite(startAt)?startAt:"")+'">در حال محاسبه زمان شروع...</div>';
     const rosterHtml=publicRosterError
       ? '<div class="public-roster"><p class="public-roster-error">نمایش اسامی در حال حاضر ممکن نیست.</p></div>'
       : '<div class="public-roster"><div class="public-roster-head"><span>👥 بازیکنان ثبت‌نام‌شده</span><span class="public-roster-count">'+names.length.toLocaleString("fa-IR")+' نفر</span></div>'+
         (names.length?'<div class="public-roster-list">'+names.map(name=>'<span class="public-player-name">'+esc(name)+'</span>').join("")+'</div>':'<p class="public-roster-empty">هنوز بازیکنی برای این سانس ثبت‌نام نکرده است.</p>')+'</div>';
-    return '<div class="session public-session"><div class="session-top"><span class="session-title">'+esc(s.title)+'</span><span class="session-tag">'+(full?'● ظرفیت تکمیل شد':'● ثبت‌نام باز است')+'</span></div><div class="session-details"><span>📅 '+dateFa(s.session_date)+'</span><span>🕒 '+esc(String(s.start_time).slice(0,5))+'</span><span>⏱ '+esc(s.duration||"۹۰ دقیقه")+'</span><span>👥 '+Number(st.registered_count).toLocaleString("fa-IR")+' از '+Number(st.capacity).toLocaleString("fa-IR")+' نفر</span><span>🪑 '+(full?'ظرفیت تکمیل':Number(st.remaining_capacity).toLocaleString("fa-IR")+' جای خالی')+'</span></div><div class="session-bottom"><span class="session-price">هزینه: '+toman(s.fee)+'</span><button class="book-btn" type="button" data-book="'+s.id+'" '+(full?'disabled aria-disabled="true"':'')+'>'+(full?'ظرفیت تکمیل شد':'ثبت‌نام در این سانس ←')+'</button></div>'+rosterHtml+'</div>';
+    return '<div class="session public-session"><div class="session-top"><span class="session-title">'+esc(s.title)+'</span><span class="session-tag">'+(full?'● ظرفیت تکمیل شد':'● ثبت‌نام باز است')+'</span></div><div class="session-details"><span>📅 '+dateFa(s.session_date)+'</span><span>🕒 '+esc(String(s.start_time).slice(0,5))+'</span><span>⏱ '+esc(s.duration||"۹۰ دقیقه")+'</span><span>👥 '+Number(st.registered_count).toLocaleString("fa-IR")+' از '+Number(st.capacity).toLocaleString("fa-IR")+' نفر</span><span>🪑 '+(full?'ظرفیت تکمیل':Number(st.remaining_capacity).toLocaleString("fa-IR")+' جای خالی')+'</span></div>'+countdownHtml+'<div class="session-bottom"><span class="session-price">هزینه: '+toman(s.fee)+'</span><button class="book-btn" type="button" data-book="'+s.id+'" '+(full?'disabled aria-disabled="true"':'')+'>'+(full?'ظرفیت تکمیل شد':'ثبت‌نام در این سانس ←')+'</button></div>'+rosterHtml+'</div>';
   }).join(""):"هنوز سانس فعالی وجود ندارد.";
+  updateSessionCountdowns();
   if(publicRosterError){
     console.warn("Public player names could not be loaded. Check the public_session_players view and its SELECT grant in Supabase.",publicRosterError);
   }
@@ -558,4 +603,5 @@ el("admin-sessions").querySelectorAll("[data-delete-session]").forEach(b=>b.oncl
 sb.auth.onAuthStateChange(()=>{if(!el("admin").classList.contains("hidden"))setTimeout(checkAdmin,0)});
 loadSessions();
 setInterval(loadSessions,10000);
+setInterval(updateSessionCountdowns,1000);
 </script></body></html>
