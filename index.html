@@ -232,12 +232,27 @@ img,svg,video,canvas{max-width:100%;height:auto}
 .footer-person h3.footer-signature{margin:9px 0 18px;font-size:clamp(18px,2.6vw,25px);letter-spacing:2px;font-weight:950;color:#fff;text-shadow:0 0 22px rgba(255,161,86,.25)}
 @media(max-width:600px){#review-form .grid{gap:12px}#review-text{min-height:120px}}
 
+
+.nav-links #sessions-nav,.nav-links #registration-nav{
+  display:inline-flex;align-items:center;gap:7px;padding:9px 13px;
+  border:1px solid rgba(126,164,196,.28);border-radius:12px;
+  background:linear-gradient(135deg,rgba(24,57,87,.72),rgba(10,31,51,.72));
+  color:#edf4fb;transition:transform .22s ease,border-color .22s ease,background .22s ease;
+}
+.nav-links #sessions-nav:hover,.nav-links #registration-nav:hover{
+  transform:translateY(-2px);border-color:rgba(255,157,74,.7);
+  background:linear-gradient(135deg,rgba(255,138,28,.2),rgba(18,48,72,.9));
+}
+.nav-links #sessions-nav .nav-icon,.nav-links #registration-nav .nav-icon{
+  stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;
+}
+
 </style></head>
 <body>
 <header id="top" class="site-header">
   <nav class="top-nav" aria-label="منوی اصلی">
     <a class="brand" href="#top"><span class="brand-ball" aria-hidden="true"><svg viewBox="0 0 64 64" role="img"><circle cx="32" cy="32" r="29" fill="#f7f9fc" stroke="#ff8a1c" stroke-width="3"/><path d="M32 17 42 24 38 36 26 36 22 24Z" fill="#102b4c"/><path d="m32 3 0 14m25 7-15 0m10 24-14-12M32 61V36M7 48l15-12M7 24l15 0" fill="none" stroke="#102b4c" stroke-width="3" stroke-linecap="round"/><path d="m22 24-9-9m29 9 9-9m-25 21-4 15m16-15 4 15" fill="none" stroke="#102b4c" stroke-width="3" stroke-linecap="round"/></svg></span><span>KARIMI<span class="brand-orange">SPORTS</span></span></a>
-    <div class="nav-links"><a href="#top" id="home-nav"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-6v-7h-4v7H4a1 1 0 0 1-1-1z"/></svg><span>صفحه اصلی</span></a><a href="#reviews-section" id="contact-nav"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM4 7l8 6 8-6"/></svg><span>ارتباط و ثبت نظرات</span></a><a href="#admin" id="header-admin-login" class="nav-admin-link"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5c0 4.5 2.8 8.2 7 10 4.2-1.8 7-5.5 7-10V6l-7-3Zm0 5a2.2 2.2 0 0 1 2.2 2.2v1.2h.8v4.8H9v-4.8h.8v-1.2A2.2 2.2 0 0 1 12 8Zm-1 3.4h2v-1.2a1 1 0 0 0-2 0v1.2Z"/></svg><span>ورود مدیر</span></a></div>
+    <div class="nav-links"><a href="#top" id="home-nav"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-6v-7h-4v7H4a1 1 0 0 1-1-1z"/></svg><span>صفحه اصلی</span></a><a href="#sessions-card" id="sessions-nav"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5h16v14H4zM8 3v7m8-7v7M4 10h16M8 14h3m2 0h3"/></svg><span>سانس‌های فعال</span></a><a href="#registration-card" id="registration-nav"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 9a7 7 0 0 1 14 0M19 8v6m-3-3h6"/></svg><span>ثبت‌نام بازیکن</span></a><a href="#reviews-section" id="contact-nav"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM4 7l8 6 8-6"/></svg><span>ارتباط و ثبت نظرات</span></a><a href="#admin" id="header-admin-login" class="nav-admin-link"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5c0 4.5 2.8 8.2 7 10 4.2-1.8 7-5.5 7-10V6l-7-3Zm0 5a2.2 2.2 0 0 1 2.2 2.2v1.2h.8v4.8H9v-4.8h.8v-1.2A2.2 2.2 0 0 1 12 8Zm-1 3.4h2v-1.2a1 1 0 0 0-2 0v1.2Z"/></svg><span>ورود مدیر</span></a></div>
   </nav>
   <div class="hero-wrap">
     <div class="hero-copy"><div class="hero-brandline">KARIMI<span>SPORTS</span></div><h1>سانس خودت رو <strong>رزرو کن!</strong></h1><p>سریع، آسان و بدون تماس تلفنی</p></div>
@@ -248,7 +263,7 @@ img,svg,video,canvas{max-width:100%;height:auto}
 <div id="notice" class="hidden"></div>
 <section id="player">
 <div class="card" id="sessions-card"><h2>سانس‌های فعال</h2><div id="sessions">در حال دریافت…</div><button class="alt" id="refresh">به‌روزرسانی</button></div>
-<div class="card"><h2>ثبت‌نام بازیکن</h2><form id="reg"><div class="grid">
+<div class="card" id="registration-card"><h2>ثبت‌نام بازیکن</h2><form id="reg"><div class="grid">
 <div class="field">نام و نام خانوادگی<small id="player-name-error" class="muted validation-hint hidden" role="alert">فقط حروف فارسی و انگلیسی و فاصله مجاز است.</small><input name="player_name" id="player-name" type="text" required maxlength="100" autocomplete="name" aria-describedby="player-name-error"></div>
 <div class="field">شماره تماس<small id="player-phone-error" class="muted validation-hint hidden" role="alert">شماره تماس فقط باید شامل عدد باشد.</small><input name="phone" id="player-phone" type="tel" required maxlength="30" inputmode="numeric" autocomplete="tel" aria-describedby="player-phone-error"></div>
 <div class="field">انتخاب سانس<select id="session-select" name="session_id" required><option value="">انتخاب سانس</option></select></div>
@@ -545,6 +560,9 @@ function tab(a){el("player").classList.toggle("hidden",a);el("admin").classList.
 function goToSection(target){target.scrollIntoView({behavior:"smooth",block:"start"})}
 el("home-nav").onclick=e=>{e.preventDefault();tab(false);setTimeout(()=>goToSection(el("top")),40)};
 el("contact-nav").onclick=e=>{e.preventDefault();tab(false);setTimeout(()=>goToSection(el("reviews-section")),40)};
+el("sessions-nav").onclick=e=>{e.preventDefault();tab(false);setTimeout(()=>goToSection(el("sessions-card")),40)};
+el("registration-nav").onclick=e=>{e.preventDefault();tab(false);setTimeout(()=>goToSection(el("registration-card")),40)};
+
 el("header-admin-login").onclick=e=>{e.preventDefault();tab(true);setTimeout(()=>goToSection(el("admin")),40)};
 async function checkAdmin(){
 const {data:{session}}=await sb.auth.getSession();
