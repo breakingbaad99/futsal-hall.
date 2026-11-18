@@ -233,15 +233,15 @@ img,svg,video,canvas{max-width:100%;height:auto}
 @media(max-width:600px){#review-form .grid{gap:12px}#review-text{min-height:120px}}
 
 
+/* Match the simple shape and typography of the home navigation link */
 .nav-links #sessions-nav,.nav-links #registration-nav{
-  display:inline-flex;align-items:center;gap:7px;padding:9px 13px;
-  border:1px solid rgba(126,164,196,.28);border-radius:12px;
-  background:linear-gradient(135deg,rgba(24,57,87,.72),rgba(10,31,51,.72));
-  color:#edf4fb;transition:transform .22s ease,border-color .22s ease,background .22s ease;
+  display:inline-flex;align-items:center;gap:7px;padding:0;
+  border:0;border-radius:0;background:transparent;color:#e8eef6;
+  box-shadow:none;font-weight:700;font-size:14px;
+  transition:color .2s;text-decoration:none;
 }
 .nav-links #sessions-nav:hover,.nav-links #registration-nav:hover{
-  transform:translateY(-2px);border-color:rgba(255,157,74,.7);
-  background:linear-gradient(135deg,rgba(255,138,28,.2),rgba(18,48,72,.9));
+  color:#ff941f;transform:none;filter:none;box-shadow:none;background:transparent;
 }
 .nav-links #sessions-nav .nav-icon,.nav-links #registration-nav .nav-icon{
   stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;
