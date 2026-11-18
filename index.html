@@ -194,20 +194,25 @@ img,svg,video,canvas{max-width:100%;height:auto}
 .session-countdown.started{border-color:rgba(67,190,132,.4);background:rgba(19,75,54,.38);color:#a9f0c9}
 @media(max-width:600px){.session-countdown{font-size:12px;padding:7px 10px}}
 
+
+#review-text{width:100%;min-height:110px;resize:vertical;font:inherit}
+.footer-manager-access{text-align:center;margin:2px 0 12px}
+.footer-manager-access a{color:#8298a9;font-size:10px;text-decoration:none;opacity:.75;transition:color .2s,opacity .2s}
+.footer-manager-access a:hover{color:#ffb16d;opacity:1}
+.reviews-card{scroll-margin-top:22px}
 </style></head>
 <body>
 <header id="top" class="site-header">
   <nav class="top-nav" aria-label="منوی اصلی">
     <a class="brand" href="#top"><span class="brand-ball" aria-hidden="true"><svg viewBox="0 0 64 64" role="img"><circle cx="32" cy="32" r="29" fill="#f7f9fc" stroke="#ff8a1c" stroke-width="3"/><path d="M32 17 42 24 38 36 26 36 22 24Z" fill="#102b4c"/><path d="m32 3 0 14m25 7-15 0m10 24-14-12M32 61V36M7 48l15-12M7 24l15 0" fill="none" stroke="#102b4c" stroke-width="3" stroke-linecap="round"/><path d="m22 24-9-9m29 9 9-9m-25 21-4 15m16-15 4 15" fill="none" stroke="#102b4c" stroke-width="3" stroke-linecap="round"/></svg></span><span>KARIMI<span class="brand-orange">SPORTS</span></span></a>
-    <div class="nav-links"><a href="#sessions-card" id="home-nav"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-6v-7h-4v7H4a1 1 0 0 1-1-1z"/></svg><span>صفحه اصلی</span></a><a href="#sessions-card"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4m8-4v4M3 9h18m-13 5 2 2 4-4"/></svg><span>سانس‌ها</span></a><a href="#reg"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="4"/><path d="M2 21v-2a7 7 0 0 1 14 0v2m4-12v6m-3-3h6"/></svg><span>ثبت‌نام بازیکن</span></a><a href="#site-footer" id="contact-nav"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM4 7l8 6 8-6"/></svg><span>ارتباط با ما</span></a><button type="button" class="nav-login" id="nav-admin-login"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 20 6v5c0 5-3.4 8.5-8 10-4.6-1.5-8-5-8-10V6z"/><path d="m9 12 2 2 4-4"/></svg><span>ورود مدیر</span></button></div>
+    <div class="nav-links"><a href="#top" id="home-nav"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-6v-7h-4v7H4a1 1 0 0 1-1-1z"/></svg><span>صفحه اصلی</span></a><a href="#reviews-section" id="contact-nav"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM4 7l8 6 8-6"/></svg><span>ارتباط و ثبت نظرات</span></a></div>
   </nav>
   <div class="hero-wrap">
-    <div class="hero-copy"><div class="hero-brandline">KARIMI<span>SPORTS</span></div><h1>سانس خودت رو <strong>رزرو کن!</strong></h1><p>سریع، آسان و بدون تماس تلفنی</p><a class="hero-cta" href="#sessions-card">مشاهده سانس‌ها <span>←</span></a></div>
+    <div class="hero-copy"><div class="hero-brandline">KARIMI<span>SPORTS</span></div><h1>سانس خودت رو <strong>رزرو کن!</strong></h1><p>سریع، آسان و بدون تماس تلفنی</p></div>
     <div class="hero-art" role="img" aria-label="بازیکن فوتسال در حال شوت کردن توپ"></div>
   </div>
 </header>
 <main>
-<div class="tabs"><button id="player-tab">سانس‌ها و ثبت‌نام</button><button class="alt" id="admin-tab">ورود مدیر</button></div>
 <div id="notice" class="hidden"></div>
 <section id="player">
 <div class="card" id="sessions-card"><h2>سانس‌های فعال</h2><div id="sessions">در حال دریافت…</div><button class="alt" id="refresh">به‌روزرسانی</button></div>
@@ -216,6 +221,18 @@ img,svg,video,canvas{max-width:100%;height:auto}
 <div class="field">شماره تماس<small id="player-phone-error" class="muted validation-hint hidden" role="alert">شماره تماس فقط باید شامل عدد باشد.</small><input name="phone" id="player-phone" type="tel" required maxlength="30" inputmode="numeric" autocomplete="tel" aria-describedby="player-phone-error"></div>
 <div class="field">انتخاب سانس<select id="session-select" name="session_id" required><option value="">انتخاب سانس</option></select></div>
 </div><button type="submit">ثبت‌نام</button><div id="reg-notice" class="hidden registration-notice" role="status" aria-live="polite"></div><p class="muted">ثبت‌نام فوری است؛ تأیید پرداخت توسط مدیر انجام می‌شود.</p></form></div>
+<div class="card reviews-card" id="reviews-section">
+  <h2>ارتباط و ثبت نظرات</h2>
+  <p class="muted">نظر و پیشنهادت رو با ما به اشتراک بگذار. ثبت نظر فقط به نام و متن نظر نیاز دارد.</p>
+  <form id="review-form">
+    <div class="grid">
+      <div class="field">نام شما<input name="visitor_name" id="review-name" type="text" maxlength="80" required autocomplete="name" placeholder="نام خود را بنویسید"></div>
+      <div class="field">نظر شما<textarea name="review_text" id="review-text" rows="4" maxlength="2000" required placeholder="نظر یا پیشنهاد شما..."></textarea></div>
+    </div>
+    <button type="submit">ارسال نظر</button>
+    <div id="review-notice" class="hidden registration-notice" role="status" aria-live="polite"></div>
+  </form>
+</div>
 </section>
 <section id="admin" class="hidden">
 <div class="card" id="login"><h2>ورود مدیر</h2><form id="login-form"><div class="grid">
@@ -230,6 +247,7 @@ img,svg,video,canvas{max-width:100%;height:auto}
 <div class="field">ظرفیت بازیکنان<input name="capacity" type="number" min="1" step="1" value="12" required><small class="muted">حداکثر تعداد بازیکنان این سانس</small></div>
 </div><button>ثبت سانس</button></form></div>
 <div class="card"><h2>مدیریت ثبت‌نام‌ها و پرداخت</h2><div id="admin-sessions"></div></div>
+<div class="card"><h2>نظرات بازدیدکنندگان</h2><p class="muted">این بخش فقط برای مدیر قابل مشاهده است.</p><div id="admin-reviews">در حال دریافت نظرات…</div></div>
 
 </div></section>
 </main>
@@ -239,7 +257,6 @@ img,svg,video,canvas{max-width:100%;height:auto}
   <div class="footer-pitch-lines" aria-hidden="true"></div>
   <div class="footer-inner">
     <div class="footer-topline">
-      <span class="footer-kicker"><span class="footer-kicker-dot"></span> FOOTBALL • DESIGN • DEVELOPMENT</span>
       <span class="footer-season">KARIMISPORTS / 2026</span>
     </div>
     <div class="footer-main">
@@ -251,9 +268,7 @@ img,svg,video,canvas{max-width:100%;height:auto}
         </div>
       </div>
       <div class="footer-person">
-        <span class="footer-eyebrow">DESIGNED &amp; DEVELOPED BY</span>
         <h3>فردین کریمی</h3>
-        <p>طراح و برنامه‌نویس وب‌سایت</p>
         <div class="footer-socials">
           <a href="https://t.me/fardnkarimi" target="_blank" rel="noopener noreferrer" aria-label="تلگرام فردین کریمی">
             <span class="footer-social-icon">➤</span><span><small>TELEGRAM</small><b>@fardnkarimi</b></span>
@@ -266,15 +281,10 @@ img,svg,video,canvas{max-width:100%;height:auto}
           </a>
         </div>
       </div>
-      <div class="footer-side-note">
-        <span class="footer-side-ball">⚽</span>
-        <strong>PLAY WITH PASSION</strong>
-        <small>ساخته‌شده برای عاشقان فوتسال</small>
-      </div>
     </div>
-    <div class="footer-bottom">
+    <div class="footer-manager-access"><a href="#admin" id="footer-admin-login">ورود مدیر</a></div>
+  <div class="footer-bottom">
       <span>© 2026 KarimiSports · تمامی حقوق محفوظ است</span>
-      <span class="footer-credit">CRAFTED WITH <i>♥</i> BY FARDIN KARIMI</span>
     </div>
   </div>
 </footer>
@@ -288,10 +298,10 @@ img,svg,video,canvas{max-width:100%;height:auto}
 .footer-pitch-lines{position:absolute;left:50%;top:50%;width:min(520px,75vw);height:230px;transform:translate(-50%,-35%);border:1px solid rgba(218,237,247,.055);border-radius:48%;pointer-events:none}
 .footer-pitch-lines:before{content:"";position:absolute;left:50%;top:0;bottom:0;border-left:1px solid rgba(218,237,247,.055)}
 .footer-pitch-lines:after{content:"";position:absolute;width:76px;height:76px;border:1px solid rgba(218,237,247,.055);border-radius:50%;left:50%;top:50%;transform:translate(-50%,-50%)}
-.footer-topline{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:17px;border-bottom:1px solid rgba(202,221,235,.13)}
+.footer-topline{display:flex;align-items:center;justify-content:flex-end;gap:12px;padding-bottom:17px;border-bottom:1px solid rgba(202,221,235,.13)}
 .footer-kicker,.footer-season{font-size:9px;letter-spacing:2px;color:#9eb2c2;font-weight:800}
 .footer-kicker{display:flex;align-items:center;gap:8px}.footer-kicker-dot{width:7px;height:7px;border-radius:50%;background:#f59a4b;box-shadow:0 0 12px #f59a4b;animation:footerPulse 2s ease-in-out infinite}
-.footer-main{display:grid;grid-template-columns:1fr 1.55fr 1fr;align-items:center;gap:28px;padding:28px 0 25px}
+.footer-main{display:grid;grid-template-columns:1fr 1.55fr;align-items:center;gap:28px;padding:28px 0 25px}
 .footer-brand{display:flex;align-items:center;gap:13px}
 .footer-emblem{width:64px;height:64px;display:grid;place-items:center;border-radius:19px;background:linear-gradient(145deg,#ffb46d,#d65e16 70%);box-shadow:0 9px 24px rgba(226,105,31,.24),inset 0 1px 0 rgba(255,255,255,.55);transform:rotate(-5deg);transition:transform .35s,box-shadow .35s}
 .footer-emblem span{font-size:35px;filter:drop-shadow(0 3px 3px #632b12)}
@@ -318,9 +328,9 @@ img,svg,video,canvas{max-width:100%;height:auto}
 @keyframes footerPulse{0%,100%{opacity:1;box-shadow:0 0 5px #f59a4b}50%{opacity:.55;box-shadow:0 0 15px #f59a4b}}
 @keyframes footerFloat{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-7px) rotate(5deg)}}
 @keyframes footerShimmer{0%{background-position:0 0}100%{background-position:200% 0}}
-@media(max-width:800px){.footer-main{grid-template-columns:1fr 1.5fr;gap:22px}.footer-side-note{display:none}.footer-brand{justify-content:center}}
+@media(max-width:800px){.footer-main{grid-template-columns:1fr 1.5fr;gap:22px}.footer-brand{justify-content:center}}
 @media(max-width:600px){.site-footer{padding:24px 14px 15px}.footer-topline{flex-direction:column;gap:7px}.footer-main{grid-template-columns:1fr;gap:22px;padding:23px 0}.footer-brand{justify-content:center}.footer-person h3{font-size:23px}.footer-socials{gap:7px}.footer-socials a{min-width:0;flex:1 1 145px;justify-content:center}.footer-bottom{flex-direction:column;align-items:center;text-align:center;gap:7px}.footer-pitch-lines{height:180px}}
-@media(prefers-reduced-motion:reduce){.site-footer:after,.footer-kicker-dot,.footer-side-ball{animation:none}.footer-emblem,.footer-socials a{transition:none}}
+@media(prefers-reduced-motion:reduce){.site-footer:after,{animation:none}.footer-emblem,.footer-socials a{transition:none}}
 </style>
 <script>
 const SUPABASE_URL="https://exruesqxsnrrjssrzqin.supabase.co";
@@ -481,18 +491,36 @@ el("reg").onsubmit=async e=>{
   regMsg("✓ ثبت‌نام با موفقیت انجام شد. پرداخت پس از بررسی مدیر تأیید می‌شود.");
   await loadSessions();
 };
+// ارسال نظر عمومی؛ خواندن نظرات فقط در پنل مدیر انجام می‌شود.
+el("review-form").onsubmit=async e=>{
+  e.preventDefault();
+  const f=new FormData(e.target);
+  const visitorName=String(f.get("visitor_name")||"").trim();
+  const reviewText=String(f.get("review_text")||"").trim();
+  const notice=el("review-notice");
+  if(visitorName.length<2||visitorName.length>80||reviewText.length<2||reviewText.length>2000){
+    notice.textContent="نام باید بین ۲ تا ۸۰ و متن نظر بین ۲ تا ۲۰۰۰ نویسه باشد.";
+    notice.className="registration-notice error";return;
+  }
+  const button=e.target.querySelector('button[type="submit"]');
+  button.disabled=true;
+  const {error}=await sb.from("site_reviews").insert({visitor_name:visitorName,review_text:reviewText});
+  button.disabled=false;
+  if(error){notice.textContent="ارسال نظر انجام نشد. لطفاً دوباره تلاش کنید.";notice.className="registration-notice error";console.error("Review submission failed:",error);return;}
+  e.target.reset();notice.textContent="✓ نظر شما با موفقیت ثبت شد. ممنون از همراهی‌تان!";notice.className="registration-notice";
+};
+
 function tab(a){el("player").classList.toggle("hidden",a);el("admin").classList.toggle("hidden",!a);if(a)checkAdmin()}
 function goToSection(target){target.scrollIntoView({behavior:"smooth",block:"start"})}
-el("player-tab").onclick=()=>{tab(false);setTimeout(()=>goToSection(el("sessions-card")),40)};
-el("admin-tab").onclick=()=>{tab(true);setTimeout(()=>goToSection(el("admin")),40)};
-el("nav-admin-login").onclick=()=>{tab(true);setTimeout(()=>goToSection(el("admin")),40)};
-el("home-nav").onclick=e=>{e.preventDefault();tab(false);setTimeout(()=>goToSection(el("sessions-card")),40)};
+el("home-nav").onclick=e=>{e.preventDefault();tab(false);setTimeout(()=>goToSection(el("top")),40)};
+el("contact-nav").onclick=e=>{e.preventDefault();tab(false);setTimeout(()=>goToSection(el("reviews-section")),40)};
+el("footer-admin-login").onclick=e=>{e.preventDefault();tab(true);setTimeout(()=>goToSection(el("admin")),40)};
 async function checkAdmin(){
 const {data:{session}}=await sb.auth.getSession();
 if(!session){el("login").classList.remove("hidden");el("panel").classList.add("hidden");return}
 const {data}=await sb.from("admin_users").select("user_id").eq("user_id",session.user.id).maybeSingle();
 if(!data){await sb.auth.signOut();msg("این حساب دسترسی مدیر ندارد.",true);return}
-el("login").classList.add("hidden");el("panel").classList.remove("hidden");loadAdmin()
+el("login").classList.add("hidden");el("panel").classList.remove("hidden");loadAdmin();loadAdminReviews()
 }
 el("login-form").onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);const {error}=await sb.auth.signInWithPassword({email:f.get("email"),password:f.get("password")});if(error){msg("ورود ناموفق بود؛ ایمیل یا رمز عبور را بررسی کنید.",true);return}checkAdmin()};
 el("logout").onclick=async()=>{await sb.auth.signOut();checkAdmin()};
@@ -542,6 +570,14 @@ el("new-session").onsubmit=async e=>{
   loadAdmin();
   loadSessions();
 };
+async function loadAdminReviews(){
+  const box=el("admin-reviews");
+  box.textContent="در حال دریافت نظرات…";
+  const {data,error}=await sb.from("site_reviews").select("id,visitor_name,review_text,created_at").order("created_at",{ascending:false});
+  if(error){box.textContent="دریافت نظرات ممکن نشد: "+error.message;return;}
+  if(!data?.length){box.textContent="هنوز نظری ثبت نشده است.";return;}
+  box.innerHTML=data.map(r=>'<article class="session" style="margin:10px 0"><div class="row"><strong>'+esc(r.visitor_name)+'</strong><small class="muted">'+new Date(r.created_at).toLocaleString("fa-IR")+'</small></div><p style="white-space:pre-wrap;line-height:2;margin:10px 0 0">'+esc(r.review_text)+'</p></article>').join("");
+}
 async function loadAdmin(){
 const {data:sessions,error}=await sb.from("sessions").select("*").order("session_date",{ascending:false});
 if(error){el("admin-sessions").textContent=error.message;return}
@@ -553,7 +589,7 @@ const list=r||[];totalPlayers+=list.length;paidPlayers+=list.filter(x=>x.paid).l
 }
 out='<div class="admin-summary"><div class="admin-stat"><strong>'+((sessions||[]).length).toLocaleString("fa-IR")+'</strong><span>کل سانس‌ها</span></div><div class="admin-stat"><strong>'+totalPlayers.toLocaleString("fa-IR")+'</strong><span>کل ثبت‌نام‌ها</span></div><div class="admin-stat"><strong>'+paidPlayers.toLocaleString("fa-IR")+'</strong><span>پرداخت‌های تأییدشده</span></div></div><div class="admin-stat" style="margin-bottom:16px;text-align:right"><span>مجموع مبالغ تأییدشده</span><strong style="font-size:19px">'+toman(paidTotal)+'</strong></div>';
 for(const item of all){const s=item.s,r=item.r,re=item.re;
-out+='<div class="session admin-session '+(s.is_open?'':'closed')+'"><div class="row"><b class="session-title">'+esc(s.title)+'</b><span class="admin-status '+(s.is_open?'':'closed')+'">'+(s.is_open?'● ثبت‌نام باز':'● ثبت‌نام بسته')+'</span></div><div class="session-details"><span>📅 '+dateFa(s.session_date)+'</span><span>🕒 '+esc(String(s.start_time).slice(0,5))+'</span><span>👥 '+r.length.toLocaleString("fa-IR")+' از '+Number(s.capacity||12).toLocaleString("fa-IR")+' نفر</span><span>💳 '+toman(s.fee)+'</span></div><div class="actions">'+((s.is_open||s.is_manually_closed)?'<button class="alt" data-open="'+s.id+'" data-val="'+s.is_open+'">'+(s.is_open?'بستن ثبت‌نام':'بازکردن ثبت‌نام')+'</button>':'')+(s.is_open?'':'<button class="danger" data-delete-session="'+s.id+'" data-title="'+esc(s.title)+'">حذف سانس</button>')+'</div><div class="grid"><div class="field">ظرفیت فعلی ویرایش ظرفیت<input type="number" min="'+r.length+'" step="1" value="'+Number(s.capacity||12)+'" data-capacity-input="'+s.id+'"><small class="muted">حداقل ظرفیت مجاز: '+r.length.toLocaleString("fa-IR")+' نفر ثبت‌نام‌شده</small></div><div class="field" style="align-self:end"><button type="button" data-save-capacity="'+s.id+'">ذخیره ظرفیت جدید</button></div></div>';
+out+='<div class="session admin-session '+(s.is_open?'':'closed')+'"><div class="row"><b class="session-title">'+esc(s.title)+'</b><span class="admin-status '+(s.is_open?'':'closed')+'">'+(s.is_open?'● ثبت‌نام باز':'● ثبت‌نام بسته')+'</span></div><div class="session-details"><span>📅 '+dateFa(s.session_date)+'</span><span>🕒 '+esc(String(s.start_time).slice(0,5))+'</span><span>👥 '+r.length.toLocaleString("fa-IR")+' از '+Number(s.capacity||12).toLocaleString("fa-IR")+' نفر</span><span>💳 '+toman(s.fee)+'</span></div><div class="actions">'+((s.is_open||s.is_manually_closed)?'<button class="alt" data-open="'+s.id+'" data-val="'+s.is_open+'">'+(s.is_open?'بستن ثبت‌نام':'بازکردن ثبت‌نام')+'</button>':'')+(s.is_open?'':'<button class="danger" data-delete-session="'+s.id+'" data-title="'+esc(s.title)+'">حذف سانس</button>')+'</div><div class="grid"><div class="field">ظرفیت فعلی ویرایش ظرفیت<input type="number" min="'+r.length+'" step="1" value="'+Number(s.capacity||12)+'" data-capacity-input="'+s.id+'"><small class="muted">حداقل ظرفیت مجاز: '+r.length.toLocaleString("fa-IR")+' نفر ثبت‌نام‌شده</small></div><div class="field" style="align-self:end"><button type="button" data-save-capacity="'+s.id+'">ذخیره ظرفیت جدید</button></div>'+(s.is_open?'<div class="field">قیمت جدید سانس (تومان)<input type="number" min="0" step="1000" value="'+Number(s.fee||0)+'" data-fee-input="'+s.id+'"><small class="muted">قیمت نمایش‌داده‌شده به بازیکنان</small></div><div class="field" style="align-self:end"><button type="button" data-save-fee="'+s.id+'">ذخیره قیمت جدید</button></div>':'')+'</div>';
 if(re)out+='<p class="red">'+esc(re.message)+'</p>';
 else if(r.length)out+='<h3>فهرست بازیکنان · '+r.length.toLocaleString("fa-IR")+' نفر</h3><div class="tablewrap"><table><tr><th>نام</th><th>تماس</th><th>مبلغ</th><th>پرداخت</th><th>عملیات</th></tr>'+r.map(x=>'<tr><td>'+esc(x.player_name)+'</td><td>'+esc(x.phone)+'</td><td>'+toman(x.amount)+'</td><td class="'+(x.paid?'pill':'red')+'">'+(x.paid?'پرداخت‌شده':'پرداخت‌نشده')+'</td><td><button data-paid="'+x.id+'" data-val="'+x.paid+'">'+(x.paid?'لغو تأیید':'تأیید پرداخت')+'</button> <button class="danger" data-delete-player="'+x.id+'" data-player="'+esc(x.player_name)+'" data-session="'+esc(s.title)+'">حذف بازیکن</button></td></tr>').join('')+'</table></div>';
 else out+='<p class="muted">هنوز بازیکنی برای این سانس ثبت‌نام نکرده است.</p>';
@@ -595,6 +631,18 @@ el("admin-sessions").querySelectorAll("[data-save-capacity]").forEach(b=>b.oncli
     await loadAdmin();return;
   }
   msg("ظرفیت با موفقیت به‌روزرسانی شد.");
+  await loadAdmin();await loadSessions();
+});
+el("admin-sessions").querySelectorAll("[data-save-fee]").forEach(b=>b.onclick=async()=>{
+  const id=b.dataset.saveFee;
+  const input=el("admin-sessions").querySelector('[data-fee-input="'+id+'"]');
+  const value=Number(input?.value);
+  if(!Number.isSafeInteger(value)||value<0){msg("قیمت باید یک عدد صحیح و صفر یا بیشتر باشد.",true);return;}
+  b.disabled=true;
+  const {error}=await sb.from("sessions").update({fee:value}).eq("id",id).eq("is_open",true).select("id");
+  b.disabled=false;
+  if(error){msg("به‌روزرسانی قیمت ناموفق بود: "+error.message,true);return;}
+  msg("قیمت سانس با موفقیت تغییر کرد.");
   await loadAdmin();await loadSessions();
 });
 el("admin-sessions").querySelectorAll("[data-delete-session]").forEach(b=>b.onclick=async()=>{const title=b.dataset.title||"این سانس";if(!confirm('حذف «'+title+'»؟ تمام ثبت‌نام‌ها و اطلاعات پرداخت این سانس برای همیشه حذف می‌شوند.'))return;b.disabled=true;const {error:regError}=await sb.from("registrations").delete().eq("session_id",b.dataset.deleteSession);if(regError){msg("حذف ثبت‌نام‌ها ناموفق بود: "+regError.message,true);b.disabled=false;return}const {error}=await sb.from("sessions").delete().eq("id",b.dataset.deleteSession).eq("is_open",false);if(error){msg("ثبت‌نام‌ها حذف شدند اما حذف سانس ناموفق بود: "+error.message,true);b.disabled=false;loadAdmin();return}msg("سانس و تمام ثبت‌نام‌های آن حذف شدند.");loadAdmin();loadSessions()});
