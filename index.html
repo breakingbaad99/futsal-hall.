@@ -855,4 +855,69 @@ setInterval(updateSessionCountdowns,1000);
 })();
 
 </script>
+
+<style id="karimisports-nav-final-fix">
+/* Unified navigation icon appearance and reliable mobile bottom bar */
+.top-nav .nav-links .nav-icon{
+  width:21px;
+  height:21px;
+  flex:0 0 21px;
+  fill:none !important;
+  stroke:#ffad62 !important;
+  stroke-width:1.7 !important;
+  stroke-linecap:round !important;
+  stroke-linejoin:round !important;
+  filter:none !important;
+}
+@media (max-width:760px){
+  /* The old header overflow:hidden clipped the fixed navigation bar. */
+  .site-header{
+    overflow:visible !important;
+  }
+  .top-nav{
+    overflow:visible !important;
+  }
+  .top-nav .nav-links{
+    position:fixed !important;
+    inset-inline:10px !important;
+    top:auto !important;
+    bottom:calc(9px + env(safe-area-inset-bottom, 0px)) !important;
+    z-index:99999 !important;
+    display:flex !important;
+    flex-direction:row !important;
+    align-items:stretch !important;
+    justify-content:space-around !important;
+    width:auto !important;
+    max-width:none !important;
+    margin:0 !important;
+  }
+  .top-nav .nav-links a,
+  .top-nav .nav-links .nav-login,
+  .top-nav .nav-links .nav-admin-link,
+  .top-nav .nav-links #sessions-nav,
+  .top-nav .nav-links #registration-nav{
+    flex:1 1 0 !important;
+    min-width:0 !important;
+    min-height:58px !important;
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:3px !important;
+    padding:5px 2px !important;
+    color:#dce8f5 !important;
+  }
+  .top-nav .nav-links .nav-icon{
+    display:block !important;
+    width:21px !important;
+    height:21px !important;
+    flex:0 0 21px !important;
+    stroke:#ffad62 !important;
+  }
+}
+@media (max-width:390px){
+  .top-nav .nav-links{inset-inline:6px !important}
+}
+</style>
+
 </body></html>
