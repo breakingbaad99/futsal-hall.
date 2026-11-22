@@ -920,4 +920,29 @@ setInterval(updateSessionCountdowns,1000);
 }
 </style>
 
+
+<style id="karimisports-mobile-nav-viewport-fix">
+@media (max-width:760px){
+  /* backdrop-filter on the nav creates a containing block for position:fixed.
+     Disable it so the bottom menu is anchored to the phone viewport. */
+  .top-nav{
+    -webkit-backdrop-filter:none !important;
+    backdrop-filter:none !important;
+    transform:none !important;
+    filter:none !important;
+    perspective:none !important;
+  }
+  .top-nav .nav-links{
+    position:fixed !important;
+    top:auto !important;
+    bottom:calc(9px + env(safe-area-inset-bottom, 0px)) !important;
+    inset-inline:10px !important;
+    z-index:2147483000 !important;
+  }
+}
+@media (max-width:390px){
+  .top-nav .nav-links{inset-inline:6px !important}
+}
+</style>
+
 </body></html>
